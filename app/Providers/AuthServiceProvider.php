@@ -2,12 +2,13 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use App\Utils\Constants;
 use App\Utils\Grants\BackofficeGrant;
 use Carbon\CarbonInterval;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Laravel\Passport\Passport;
+use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Bridge\RefreshTokenRepository;
+use Laravel\Passport\Passport;
 use League\OAuth2\Server\AuthorizationServer;
 
 class AuthServiceProvider extends ServiceProvider
@@ -18,7 +19,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-         'App\Models\Model' => 'App\Policies\ModelPolicy',
+        'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 
     /**
@@ -29,6 +30,10 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Gate::before(function ($user) {
+            return $user->hasRole(Constants::ROLE_SUPER_ADMIN) ? true : null;
+        });
 
         Passport::tokensExpireIn(now()->addDays(7));
         Passport::refreshTokensExpireIn(now()->addDays(7));

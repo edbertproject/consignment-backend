@@ -32,12 +32,12 @@ class ValidForgotPasswordEmail implements Rule
                 $query->when(!$this->isAdmin, function ($queryWhen) {
                     $queryWhen->whereIn('role_id', [
                         Constants::ROLE_PUBLIC,
-                        Constants::ROLE_PARTNER
+                        Constants::ROLE_PARTNER,
                     ]);
                 }, function ($queryWhen) {
                     $queryWhen->whereNotIn('role_id', [
                         Constants::ROLE_PUBLIC,
-                        Constants::ROLE_PARTNER
+                        Constants::ROLE_PARTNER,
                     ]);
                 });
             })->whereNull('deleted_at')

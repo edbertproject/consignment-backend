@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Entities\User;
+use App\Entities\UserToken;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePasswordRequest;
-use App\Entities\User;
-use App\Models\UserToken;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -27,8 +27,8 @@ class CreatePasswordController extends Controller
      *
      * @var string
      */
-
-    public function createPassword(CreatePasswordRequest $request) {
+    public function createPassword(CreatePasswordRequest $request)
+    {
         try {
             DB::beginTransaction();
 
@@ -36,7 +36,7 @@ class CreatePasswordController extends Controller
 
             $data->fill([
                 'password' => Hash::make($request->get('password')),
-                'is_active' => true
+                'is_active' => true,
             ]);
             $data->save();
 
@@ -48,12 +48,11 @@ class CreatePasswordController extends Controller
                 return new JsonResponse(['message' => 'Your password has been created'], 200);
             }
 
-            return redirect('/home')
-                ->with('status', 'Your password has been created');
+            return redirect('/home')->with('status', 'Your password has been created');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return ExceptionService::responseJson($e);
+            return response()->json($e, 500);
         }
     }
 }

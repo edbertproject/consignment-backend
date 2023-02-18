@@ -26,7 +26,7 @@ class ForgotPasswordController extends Controller
     {
         $request->validate([
             'email' => ['required', 'email', new ValidForgotPasswordEmail($request->get('is_admin'))],
-            'is_admin' => 'nullable|boolean'
+            'is_admin' => 'nullable|boolean',
         ]);
     }
 }

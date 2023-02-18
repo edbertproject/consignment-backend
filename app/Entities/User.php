@@ -2,25 +2,17 @@
 
 namespace App\Entities;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Passport\HasApiTokens;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Permission\Traits\HasRoles;
+use App\Entities\Interfaces\BaseAuthenticatableModel;
 
-class User extends Authenticatable implements HasMedia
+class User extends BaseAuthenticatableModel
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, InteractsWithMedia;
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'username',
         'name',
         'email',
         'password',

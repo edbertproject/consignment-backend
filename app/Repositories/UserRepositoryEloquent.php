@@ -2,17 +2,20 @@
 
 namespace App\Repositories;
 
-use Prettus\Repository\Eloquent\BaseRepository;
-use Prettus\Repository\Criteria\RequestCriteria;
 use App\Entities\User;
+use Prettus\Repository\Criteria\RequestCriteria;
+use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
  * Class UserRepositoryRepositoryEloquent.
- *
- * @package namespace App\Repositories;
  */
 class UserRepositoryEloquent extends BaseRepository implements UserRepository
 {
+    protected $fieldSearchable = [
+        'name',
+        'email'
+    ];
+
     /**
      * Specify Model class name
      *
@@ -23,8 +26,6 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
         return User::class;
     }
 
-
-
     /**
      * Boot up the repository, pushing criteria
      */
@@ -32,5 +33,4 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-
 }

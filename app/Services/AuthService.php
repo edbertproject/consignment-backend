@@ -24,12 +24,12 @@ class AuthService
             })
             ->first();
 
-        if(!$user) {
+        if (! $user) {
             return false;
         }
 
         $verifyPassword = Hash::check($password, $user->password);
-        if(!$verifyPassword) {
+        if (! $verifyPassword) {
             return false;
         }
 
@@ -109,12 +109,12 @@ class AuthService
 
     protected static function retrieveByCredentials(array $credentials)
     {
-        $isAdmin = !empty($credentials['is_admin']) ? $credentials['is_admin'] : 0;
+        $isAdmin = ! empty($credentials['is_admin']) ? $credentials['is_admin'] : 0;
 
         $query = User::query()
             ->where('email', $credentials['email'])
             ->whereHas('roleUser', function ($query) use ($isAdmin) {
-                $query->when(!$isAdmin, function ($queryWhen) {
+                $query->when(! $isAdmin, function ($queryWhen) {
                     $queryWhen->where('role_id', Constants::ROLE_PUBLIC);
                 }, function ($queryWhen) {
                     $queryWhen->where('role_id', '!=', Constants::ROLE_PUBLIC);

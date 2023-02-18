@@ -2,8 +2,8 @@
 
 namespace App\Utils\Grants;
 
-use App\Utils\Constants;
 use App\Services\AuthService;
+use App\Utils\Constants;
 use DateInterval;
 use Laravel\Passport\Bridge\User;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
@@ -20,7 +20,7 @@ use RuntimeException;
 class BackofficeGrant extends AbstractGrant
 {
     /**
-     * @param RefreshTokenRepositoryInterface $refreshTokenRepository
+     * @param  RefreshTokenRepositoryInterface  $refreshTokenRepository
      */
     public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository)
     {
@@ -39,10 +39,11 @@ class BackofficeGrant extends AbstractGrant
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @param ResponseTypeInterface $responseType
-     * @param DateInterval $accessTokenTTL
+     * @param  ServerRequestInterface  $request
+     * @param  ResponseTypeInterface  $responseType
+     * @param  DateInterval  $accessTokenTTL
      * @return ResponseTypeInterface
+     *
      * @throws OAuthServerException
      * @throws UniqueTokenIdentifierConstraintViolationException
      */
@@ -71,9 +72,10 @@ class BackofficeGrant extends AbstractGrant
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @param ClientEntityInterface $client
+     * @param  ServerRequestInterface  $request
+     * @param  ClientEntityInterface  $client
      * @return User|UserEntityInterface
+     *
      * @throws OAuthServerException
      */
     protected function validateUser(ServerRequestInterface $request, ClientEntityInterface $client)
@@ -90,7 +92,7 @@ class BackofficeGrant extends AbstractGrant
 
         $isValidCredential = AuthService::verifyUser($email, $password);
 
-        if (!$isValidCredential) {
+        if (! $isValidCredential) {
             throw OAuthServerException::invalidCredentials();
         }
 

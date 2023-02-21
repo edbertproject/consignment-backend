@@ -2,24 +2,24 @@
 
 namespace App\Entities;
 
-use Illuminate\Database\Eloquent\Model;
-use Prettus\Repository\Contracts\Transformable;
-use Prettus\Repository\Traits\TransformableTrait;
+use App\Entities\Interfaces\BaseModel;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class UserToken.
  *
  * @package namespace App\Entities;
  */
-class UserToken extends Model implements Transformable
+class UserToken extends BaseModel
 {
-    use TransformableTrait;
+    use SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [];
+    protected $fillable = [
+        'user_id',
+        'token'
+    ];
 
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

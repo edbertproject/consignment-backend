@@ -11,6 +11,7 @@ use App\Notifications\FirstLoginNotification;
 use App\Notifications\VerifyEmailNotification;
 use App\Providers\RouteServiceProvider;
 use App\Repositories\UserRepository;
+use App\Services\ExceptionService;
 use App\Utils\Constants;
 use Carbon\Carbon;
 use Faker\Provider\Base;
@@ -26,7 +27,6 @@ use Exception;
 class RegisterController extends Controller
 {
     public function __construct(protected UserRepository $repository) {
-        
     }
 
     public function index(Request $request)
@@ -57,9 +57,7 @@ class RegisterController extends Controller
 
             $data = $this->repository->create($request->all());
 
-            $data->roleUser()->create([
-                'role_id' => Constants::ROLE_PUBLIC_ID,
-            ]);
+            $data->assignRole(Constants::ROLE_PUBLIC);
 
             $token = Str::random(50);
             $url = $request->get('url');
@@ -78,8 +76,7 @@ class RegisterController extends Controller
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-
-            return response()->json($e, 500);
+            return ExceptionService::responseJson($e);
         }
     }
 
@@ -99,12 +96,6 @@ class RegisterController extends Controller
             ]);
             $data->save();
 
-            $data->customer()->create([
-                'name' => $data->name,
-                'email' => $data->email,
-                'phone_number' => $data->phone_number,
-            ]);
-
             $userToken->delete();
 
             $data->notify(new FirstLoginNotification());
@@ -113,12 +104,11 @@ class RegisterController extends Controller
 
             return ($this->show($request, $data->id))->additional([
                 'success' => true,
-                'message' => 'Data created.'
+                'message' => 'Data verified.'
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-
-            return response()->json($e, 500);
+            return ExceptionService::responseJson($e);
         }
     }
 }

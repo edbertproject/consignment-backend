@@ -6,10 +6,10 @@ use App\Entities\User;
 use App\Entities\UserToken;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePasswordRequest;
+use App\Services\ExceptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Vodeamanager\Core\Utilities\Facades\ExceptionService;
 
 class CreatePasswordController extends Controller
 {
@@ -51,8 +51,7 @@ class CreatePasswordController extends Controller
             return redirect('/home')->with('status', 'Your password has been created');
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json($e, 500);
+            return ExceptionService::responseJson($e);
         }
     }
 }

@@ -115,7 +115,7 @@ class BackofficeGrant extends AbstractGrant
         }
 
         $user = (new $model)->where('email', $username)
-            ->whereHas('roleUser', function ($query) {
+            ->whereHas('roles', function ($query) {
                 $query->where('role_id', '!=', Constants::ROLE_PUBLIC);
             })->first();
 

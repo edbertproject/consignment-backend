@@ -7,6 +7,8 @@ use App\Http\Requests\AccountUpdateRequest;
 use App\Http\Resources\BaseResource;
 use App\Http\Requests\AccountUpdatePasswordRequest;
 use App\Services\ExceptionService;
+use App\Services\MediaService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,20 +16,16 @@ use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
 {
-    protected $lazyLoadingRelationAccount = [
-        // 'roleUser.role',
-        'roles',
-        'photo',
-        // 'customer',
-    ];
-
     public function account(Request $request)
     {
         $user = $request->user();
 
-        $data = User::with(['photo'])
+        $data = User::with(['media','roles'])
             ->select('users.*')
             ->findOrFail($user->id);
+
+        $data['role'] = $data->getRoleNames();
+        $data['permission'] = $data->getAllPermissions()->pluck('name')->all();
 
         return new BaseResource($data);
     }
@@ -42,6 +40,8 @@ class AccountController extends Controller
             $data = Auth::user();
             $data->fill($request->only($userFillable));
             $data->save();
+
+            MediaService::sync($data,$request,['photo']);
 
             DB::commit();
 
@@ -70,7 +70,7 @@ class AccountController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data updated.',
+                'message' => 'Password updated.',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -93,7 +93,7 @@ class AccountController extends Controller
 
         $user->unreadNotifications()
             ->update([
-                'read_at' => \Illuminate\Support\Carbon::now(),
+                'read_at' => Carbon::now(),
             ]);
 
         return response()->json([

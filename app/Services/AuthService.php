@@ -19,8 +19,8 @@ class AuthService
     {
         $user = User::query()
             ->where('email', $email)
-            ->whereHas('roleUser', function ($query) {
-                $query->where('role_id', '!=', Constants::ROLE_PUBLIC);
+            ->whereHas('roles', function ($query) {
+                $query->where('role_id', '!=', Constants::ROLE_PUBLIC_ID);
             })
             ->first();
 
@@ -113,11 +113,11 @@ class AuthService
 
         $query = User::query()
             ->where('email', $credentials['email'])
-            ->whereHas('roleUser', function ($query) use ($isAdmin) {
+            ->whereHas('roles', function ($query) use ($isAdmin) {
                 $query->when(! $isAdmin, function ($queryWhen) {
-                    $queryWhen->where('role_id', Constants::ROLE_PUBLIC);
+                    $queryWhen->where('role_id', Constants::ROLE_PUBLIC_ID);
                 }, function ($queryWhen) {
-                    $queryWhen->where('role_id', '!=', Constants::ROLE_PUBLIC);
+                    $queryWhen->where('role_id', '!=', Constants::ROLE_PUBLIC_ID);
                 });
             });
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\MediaService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +26,11 @@ class AccountUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:15',
+            'date_of_birth' => 'required|date_format:Y-m-d',
+            'gender' => 'required|in:Male,Female',
+            'photo' => array_merge(['nullable'], MediaService::fileRule(['image'])),
         ];
     }
 }

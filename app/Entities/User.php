@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use App\Entities\Interfaces\BaseAuthenticatableModel;
+use App\Notifications\ResetPasswordRequestNotification;
 
 class User extends BaseAuthenticatableModel
 {
@@ -15,7 +16,17 @@ class User extends BaseAuthenticatableModel
         'username',
         'name',
         'email',
+        'email_verified_at',
         'password',
+        'old_password',
+        'phone_number',
+        'date_of_birth',
+        'gender',
+        'bank_name',
+        'bank_number',
+        'provider',
+        'provider_id',
+        'is_active',
     ];
 
     /**
@@ -25,6 +36,7 @@ class User extends BaseAuthenticatableModel
      */
     protected $hidden = [
         'password',
+        'old_password',
         'remember_token',
     ];
 
@@ -36,4 +48,31 @@ class User extends BaseAuthenticatableModel
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Send email for reset password
+     *
+     * @param string $token
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordRequestNotification($token));
+    }
+
+    public function userToken() {
+        return $this->hasOne(UserToken::class, 'user_id');
+    }
+
+    public function getTotalNotificationAttribute() {
+        return count($this->notifications);
+    }
+
+    public function getTotalUnreadNotificationAttribute() {
+        return $this->unreadNotifications()->count();
+    }
+
+    public function findForPassport($username) {
+        return $this->where('email', $username)
+            ->where('is_active', 1)->first();
+    }
 }

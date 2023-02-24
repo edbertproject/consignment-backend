@@ -2,7 +2,7 @@
 
 namespace App\Entities;
 
-use App\Entities\Interfaces\BaseModel;
+use App\Entities\Base\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**

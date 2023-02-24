@@ -2,12 +2,15 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\UserInternalRoleRule;
 use App\Rules\UsernameRule;
 use App\Rules\ValidUniqueRegisterEmail;
+use App\Services\MediaService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 
-class UserCreateRequest extends FormRequest
+class UserInternalCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,24 +19,24 @@ class UserCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Auth::check();
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function rules()
     {
-        $rules = [
+        return [
             'name' => ['required', 'string'],
             'username' => ['required', 'string' , 'unique:users,username,NULL,id,deleted_at,NULL' , new UsernameRule],
-            'email' => ['required', 'email', 'unique:users,email,NULL,id,deleted_at,NULL'],
+            'email' => ['required', 'email', 'unique:users,email,'.$this->id.',id,deleted_at,NULL'],
             'phone_number' => ['required', 'numeric'],
-            'password' => ['required', 'string', Password::min(8)->letters()->numbers()->symbols()]
+            'password' => ['required', 'string', Password::min(8)->letters()->numbers()->symbols()],
+            'photo' => array_merge(['nullable'], MediaService::fileRule(['image'])),
+            'role_id' => ['required', 'exists:roles,id,deleted_at,NULL', new UserInternalRoleRule],
         ];
-
-        return $rules;
     }
 }

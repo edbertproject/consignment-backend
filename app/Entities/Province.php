@@ -2,8 +2,7 @@
 
 namespace App\Entities;
 
-use Illuminate\Database\Eloquent\Model;
-use Prettus\Repository\Contracts\Transformable;
+use App\Entities\Base\BaseModel;
 use Prettus\Repository\Traits\TransformableTrait;
 
 /**
@@ -11,10 +10,8 @@ use Prettus\Repository\Traits\TransformableTrait;
  *
  * @package namespace App\Entities;
  */
-class Province extends Model implements Transformable
+class Province extends BaseModel
 {
-    use TransformableTrait;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -22,4 +19,8 @@ class Province extends Model implements Transformable
      */
     protected $fillable = [];
 
+
+    public function cities() {
+        return $this->hasMany(City::class);
+    }
 }

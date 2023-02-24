@@ -19,10 +19,30 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             [
+                'label' => 'User Public',
+                'group' => 'user_public',
+                'names' => Constants::PERMISSION_RW
+            ],
+            [
+                'label' => 'User Internal',
+                'group' => 'user_internal',
+                'names' => Constants::PERMISSION_RWD
+            ],
+            [
+                'label' => 'User Partner',
+                'group' => 'user_partner',
+                'names' => Constants::PERMISSION_RWD
+            ],
+            [
+                'label' => 'Role',
+                'group' => 'role',
+                'names' => Constants::PERMISSION_RWD
+            ],
+            [
                 'label' => 'Product Category',
                 'group' => 'product_category',
                 'names' => Constants::PERMISSION_RWD
-            ]
+            ],
         ];
 
 

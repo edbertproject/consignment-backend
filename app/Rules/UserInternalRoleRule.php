@@ -2,22 +2,19 @@
 
 namespace App\Rules;
 
-use App\Entities\User;
 use App\Utils\Constants;
 use Illuminate\Contracts\Validation\Rule;
 
-class ValidUniqueRegisterEmail implements Rule
+class UserInternalRoleRule implements Rule
 {
-    protected $message;
-
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct($message = 'The :attribute has already been taken.')
+    public function __construct()
     {
-        $this->message = $message;
+        //
     }
 
     /**
@@ -29,10 +26,10 @@ class ValidUniqueRegisterEmail implements Rule
      */
     public function passes($attribute, $value)
     {
-        return User::query()
-            ->where('email', $value)
-            ->whereNull('deleted_at')
-            ->doesntExist();
+        return !in_array($value, [
+            Constants::ROLE_PARTNER_ID,
+            Constants::ROLE_PUBLIC_ID
+        ]);
     }
 
     /**
@@ -42,6 +39,6 @@ class ValidUniqueRegisterEmail implements Rule
      */
     public function message()
     {
-        return __($this->message);
+        return 'Role is forbidden.';
     }
 }

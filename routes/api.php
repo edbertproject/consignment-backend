@@ -37,7 +37,22 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/notification/read-all', 'AccountController@readAllNotification')->name('account.notification.read');
     });
 
-    Route::group(['prefix' => 'admin', 'middleware' => ['role:Super Admin|Admin|Partner']], function () {
+    Route::group(['prefix' => 'admin', 'middleware' => ['ensure_not_role:Public|Partner']], function () {
+
+        Route::get('/user-public', ['uses' => 'UserPublicController@index', 'middleware' => ['permission:read user public']]);
+        Route::get('/user-public/{id}', ['uses' => 'UserPublicController@show', 'middleware' => ['permission:read user public']]);
+
+        Route::get('/user-internal', ['uses' => 'UserInternalController@index', 'middleware' => ['permission:read user internal']]);
+        Route::post('/user-internal', ['uses' => 'UserInternalController@store', 'middleware' => ['permission:write user internal']]);
+        Route::get('/user-internal/{id}', ['uses' => 'UserInternalController@show', 'middleware' => ['permission:read user internal']]);
+        Route::put('/user-internal/{id}', ['uses' => 'UserInternalController@update', 'middleware' => ['permission:write user internal']]);
+        Route::delete('/user-internal/{id}', ['uses' => 'UserInternalController@destroy', 'middleware' => ['permission:delete user internal']]);
+
+        Route::get('/roles', ['uses' => 'RolesController@index', 'middleware' => ['permission:read role']]);
+        Route::post('/role', ['uses' => 'RolesController@store', 'middleware' => ['permission:write role']]);
+        Route::get('/role/{id}', ['uses' => 'RolesController@show', 'middleware' => ['permission:read role']]);
+        Route::put('/role/{id}', ['uses' => 'RolesController@update', 'middleware' => ['permission:write role']]);
+        Route::delete('/role/{id}', ['uses' => 'RolesController@destroy', 'middleware' => ['permission:delete role']]);
 
         Route::get('/product-categories', ['uses' => 'ProductCategoriesController@index', 'middleware' => ['permission:read product category']]);
         Route::post('/product-category', ['uses' => 'ProductCategoriesController@store', 'middleware' => ['permission:write product category']]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Criteria\UserPublicCriteria;
 use App\Entities\UserToken;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserCreateRequest;
@@ -13,6 +14,7 @@ use App\Providers\RouteServiceProvider;
 use App\Repositories\UserRepository;
 use App\Services\ExceptionService;
 use App\Utils\Constants;
+use App\Utils\Traits\RestControllerTrait;
 use Carbon\Carbon;
 use Faker\Provider\Base;
 use Illuminate\Http\JsonResponse;
@@ -26,23 +28,12 @@ use Exception;
 
 class RegisterController extends Controller
 {
-    public function __construct(protected UserRepository $repository) {
+    use RestControllerTrait {
+        RestControllerTrait::__construct as public __rest;
     }
 
-    public function index(Request $request)
-    {
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        return BaseResource::collection($this->repository->paginate($request->per_page));
-    }
-
-    public function show(Request $request, int $id): BaseResource
-    {
-        $user = $this->repository->scopeQuery(function($query){
-            return $query->withTrashed();
-        })->find($id);
-
-        return new BaseResource($user);
+    public function __construct(UserRepository $repository) {
+        $this->__rest($repository);
     }
 
     public function store(UserCreateRequest $request)

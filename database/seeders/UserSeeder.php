@@ -24,13 +24,6 @@ class UserSeeder extends Seeder
                 'is_active' => true
             ],
             [
-                'username' => 'admin',
-                'name' => 'Admin',
-                'email' => 'admin@default.id',
-                'password' => Hash::make('12345678'),
-                'is_active' => true
-            ],
-            [
                 'username' => 'partner',
                 'name' => 'Partner',
                 'email' => 'partner@default.id',

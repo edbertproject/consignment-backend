@@ -2,11 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\CodeRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
-class ProductCategoryUpdateRequest extends FormRequest
+class UserPartnerUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,7 +13,7 @@ class ProductCategoryUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::check();
+        return false;
     }
 
     /**
@@ -26,8 +24,7 @@ class ProductCategoryUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'code' => ['required', 'unique:product_categories,code,'.$this->id.',id,deleted_at,NULL', new CodeRule],
-            'name' => 'required',
+            //
         ];
     }
 }

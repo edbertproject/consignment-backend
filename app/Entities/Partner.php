@@ -2,27 +2,27 @@
 
 namespace App\Entities;
 
-use Illuminate\Database\Eloquent\Model;
-use Prettus\Repository\Contracts\Transformable;
-use Prettus\Repository\Traits\TransformableTrait;
+use App\Entities\Base\BaseModel;
 
 /**
  * Class Partner.
  *
  * @package namespace App\Entities;
  */
-class Partner extends Model implements Transformable
+class Partner extends BaseModel
 {
-    use TransformableTrait;
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'address',
-        'postal_code'
+        'user_id',
+        'full_address',
+        'postal_code',
+        'province_id',
+        'city_id',
+        'district_id',
+        'is_approve'
     ];
-
 }

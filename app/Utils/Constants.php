@@ -28,17 +28,19 @@ class Constants
 
     const ROLE_SUPER_ADMIN_ID = 1;
 
+    const ROLE_SUPER_ADMIN_CODE = "super_admin";
+
     const ROLE_SUPER_ADMIN = "Super Admin";
 
-    const ROLE_ADMIN_ID = 2;
+    const ROLE_PARTNER_ID = 2;
 
-    const ROLE_ADMIN = "Admin";
-
-    const ROLE_PARTNER_ID = 3;
+    const ROLE_PARTNER_CODE= "partner";
 
     const ROLE_PARTNER = "Partner";
 
-    const ROLE_PUBLIC_ID = 4;
+    const ROLE_PUBLIC_ID = 3;
+
+    const ROLE_PUBLIC_CODE = 'public';
 
     const ROLE_PUBLIC = "Public";
 
@@ -49,4 +51,6 @@ class Constants
     const XENDIT_FEE_CREDIT_CARD_PERCENTAGE = 2.9;
 
     const PERMISSION_RWD = ['read', 'write' ,'delete'];
+    const PERMISSION_RW = ['read', 'write'];
+    const PERMISSION_R = ['read'];
 }

@@ -35,12 +35,12 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasRole(Constants::ROLE_SUPER_ADMIN) ? true : null;
         });
 
-        Passport::tokensExpireIn(now()->addDays(7));
-        Passport::refreshTokensExpireIn(now()->addDays(7));
+        Passport::tokensExpireIn(now()->addMonths(7));
+        Passport::refreshTokensExpireIn(now()->addMonths(7));
         Passport::personalAccessTokensExpireIn(now()->addMonths(7));
 
         app(AuthorizationServer::class)->enableGrantType(
-            $this->makeBackofficeGrant(), CarbonInterval::day(7)
+            $this->makeBackofficeGrant(), CarbonInterval::months(7)
         );
     }
 

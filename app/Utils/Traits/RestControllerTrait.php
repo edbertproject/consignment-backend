@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\DB;
 trait RestControllerTrait
 {
     public $repository;
-    protected $indexCriterias = [];
-    protected $selectCriterias = [];
+    protected array $indexCriterias = [];
+    protected array $selectCriterias = [];
     protected $indexResource = BaseResource::class;
     protected $showResource = BaseResource::class;
 
@@ -36,8 +36,14 @@ trait RestControllerTrait
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        foreach ($this->selectCriterias as $selectCriteria) {
-            $this->repository->pushCriteria(new $selectCriteria($request));
+        if (empty($this->selectCriterias)) {
+            foreach ($this->indexCriterias as $indexCriteria) {
+                $this->repository->pushCriteria(new $indexCriteria($request));
+            }
+        } else {
+            foreach ($this->selectCriterias as $selectCriteria) {
+                $this->repository->pushCriteria(new $selectCriteria($request));
+            }
         }
 
         return $this->indexResource::collection($this->repository->paginate($request->per_page));
@@ -45,9 +51,13 @@ trait RestControllerTrait
 
     public function show(Request $request, int $id): BaseResource
     {
+        foreach ($this->indexCriterias as $indexCriteria) {
+            $this->repository->pushCriteria(new $indexCriteria($request));
+        }
+
         $user = $this->repository->scopeQuery(function($query){
-            return $query->withTrashed();
-        })->find($id);
+                return $query->withTrashed();
+            })->find($id);
 
         return new $this->showResource($user);
     }
@@ -55,6 +65,11 @@ trait RestControllerTrait
     public function destroy(Request $request, $id){
         try {
             DB::beginTransaction();
+
+            foreach ($this->indexCriterias as $indexCriteria) {
+                $this->repository->pushCriteria(new $indexCriteria($request));
+            }
+
             $deleted = $this->repository->delete($id);
             DB::commit();
 

@@ -22,6 +22,10 @@ return new class extends Migration
             $table->string('password');
             $table->text('old_password')->nullable();
             $table->string('phone_number')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('bank_name')->nullable();
+            $table->string('bank_number')->nullable();
             $table->string('provider')->nullable();
             $table->text('provider_id')->nullable();
             $table->boolean('is_active')->default(false);

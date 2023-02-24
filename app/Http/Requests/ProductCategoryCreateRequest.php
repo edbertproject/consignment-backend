@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CodeRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,8 +26,8 @@ class ProductCategoryCreateRequest extends FormRequest
     public function rules()
     {
         return [
+            'code' => ['required', 'unique:product_categories,code,NULL,id,deleted_at,NULL', new CodeRule],
             'name' => 'required',
-            'code' => 'required|unique:product_categories,code,NULL,id,deleted_at,NULL',
         ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entities\Interfaces;
+namespace App\Entities\Base;
 
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

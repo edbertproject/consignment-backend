@@ -2,16 +2,20 @@
 
 namespace App\Entities;
 
-use Prettus\Repository\Contracts\Transformable;
-use Prettus\Repository\Traits\TransformableTrait;
-use Spatie\Permission\Models\Role as SpatieRole;
+use App\Entities\Base\BaseRoleModel;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Role.
  */
-class Role extends SpatieRole implements Transformable
+class Role extends BaseRoleModel
 {
-    use TransformableTrait;
+    use SoftDeletes;
 
-    protected $guard_name = 'api';
+    protected $fillable = [
+        'code',
+        'name',
+        'is_admin',
+        'guard_name'
+    ];
 }

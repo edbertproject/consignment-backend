@@ -2,8 +2,10 @@
 
 namespace App\Entities;
 
-use App\Entities\Interfaces\BaseAuthenticatableModel;
+use App\Entities\Base\BaseAuthenticatableModel;
 use App\Notifications\ResetPasswordRequestNotification;
+use App\Utils\Constants;
+use App\Utils\Traits\WithAbility;
 
 class User extends BaseAuthenticatableModel
 {
@@ -50,6 +52,18 @@ class User extends BaseAuthenticatableModel
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    public $appends = [
+        'status',
+        'can_update',
+        'can_delete',
+        'can_approve'
+    ];
+
+    /**
      * Send email for reset password
      *
      * @param string $token
@@ -63,6 +77,10 @@ class User extends BaseAuthenticatableModel
         return $this->hasOne(UserToken::class, 'user_id');
     }
 
+    public function partner() {
+        return $this->hasOne(Partner::class, 'user_id');
+    }
+
     public function getTotalNotificationAttribute() {
         return count($this->notifications);
     }
@@ -72,7 +90,42 @@ class User extends BaseAuthenticatableModel
     }
 
     public function findForPassport($username) {
-        return $this->where('email', $username)
-            ->where('is_active', 1)->first();
+        return $this->where(function ($w) use($username){
+            $w->where('email', $username)->orWhere('username', $username);
+        })->where('is_active', 1)->first();
+    }
+
+    public function getCanUpdateAttribute() {
+        return $this->roles()
+            ->where('role_id','!=',Constants::ROLE_PUBLIC_ID)
+            ->exists();
+    }
+
+    public function getCanDeleteAttribute() {
+        return $this->getCanUpdateAttribute();
+    }
+
+    public function getCanApproveAttribute() {
+        if ($this->roles()
+            ->where('role_id',Constants::ROLE_PARTNER_ID)
+            ->exists()) {
+            return !$this->partner->is_approve;
+        }
+
+        return false;
+    }
+
+    public function getStatusAttribute() {
+        if ($this->roles()
+            ->where('role_id',Constants::ROLE_PARTNER_ID)
+            ->exists() && !$this->partner->is_approve) {
+            return 'Waiting Approval';
+        }
+
+        if (!$this->is_active) {
+            return 'Inactive';
+        }
+
+        return 'Active';
     }
 }

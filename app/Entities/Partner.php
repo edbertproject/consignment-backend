@@ -23,6 +23,6 @@ class Partner extends BaseModel
         'province_id',
         'city_id',
         'district_id',
-        'is_approve'
+        'status'
     ];
 }

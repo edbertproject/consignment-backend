@@ -2,36 +2,46 @@
 
 namespace App\Entities;
 
-use Illuminate\Database\Eloquent\Model;
-use Prettus\Repository\Contracts\Transformable;
-use Prettus\Repository\Traits\TransformableTrait;
+use App\Entities\Base\BaseModel;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Product.
  *
  * @package namespace App\Entities;
  */
-class Product extends Model implements Transformable
+class Product extends BaseModel
 {
-    use TransformableTrait;
-
-    const CONDITION_BNIB = "Brand New In Box";
-    const CONDITION_BNOB = "Brand New In Box";
-    const CONDITION_VGOOD = "Very Good Condition";
-    const CONDITION_GOOD = "Good Condition";
-    const CONDITION_JUDGE = "Judge By Picture";
-
-    const WARRANTY_ON = "On";
-    const WARRANTY_OFF = "Off";
-
-    const TYPE_CONSIGN = "Consign";
-    const TYPE_AUCTION = "Auction";
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'product_category_id',
+        'type',
+        'name',
+        'price',
+        'start_price',
+        'multiplied_price',
+        'desired_price',
+        'start_date',
+        'end_date',
+        'weight',
+        'quantity',
+        'long_dimension',
+        'wide_dimension',
+        'high_dimension',
+        'condition',
+        'warranty',
+        'description',
+        'cancel_reason',
+        'status'
+    ];
 
+    public function productCategory() {
+        return $this->belongsTo(ProductCategory::class);
+    }
 }

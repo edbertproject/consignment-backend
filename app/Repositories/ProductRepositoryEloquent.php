@@ -7,6 +7,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\ProductRepository;
 use App\Entities\Product;
 use App\Validators\ProductValidator;
+use Prettus\Repository\Traits\CacheableRepository;
 
 /**
  * Class ProductRepositoryEloquent.
@@ -15,6 +16,14 @@ use App\Validators\ProductValidator;
  */
 class ProductRepositoryEloquent extends BaseRepository implements ProductRepository
 {
+    use CacheableRepository;
+
+    protected $fieldSearchable = [
+        'category.name' => 'like',
+        'type' => 'like',
+        'code' => 'like',
+    ];
+
     /**
      * Specify Model class name
      *
@@ -25,7 +34,7 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
         return Product::class;
     }
 
-    
+
 
     /**
      * Boot up the repository, pushing criteria
@@ -34,5 +43,5 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-    
+
 }

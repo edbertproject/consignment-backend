@@ -23,4 +23,8 @@ class ProductCategory extends BaseModel
         'code',
         'name'
     ];
+
+    public function products() {
+        return $this->hasMany(Product::class);
+    }
 }

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use App\Utils\Constants;
 
 /**
  * Class CreatePartnersTable.
@@ -24,7 +25,7 @@ class CreatePartnersTable extends Migration
             $table->relation('city_id', 'cities', false);
             $table->relation('district_id', 'districts', false);
 
-            $table->boolean('is_approve');
+            $table->string('status')->default(Constants::PARTNER_STATUS_WAITING_APPROVAL);
 
             $table->baseStamps();
 		});

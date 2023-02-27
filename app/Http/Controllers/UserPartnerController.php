@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Criteria\UserPartnerCriteria;
+use App\Http\Requests\UserPartnerApproveRequest;
 use App\Http\Requests\UserPartnerCreateRequest;
+use App\Http\Requests\UserPartnerRejectedRequest;
 use App\Http\Requests\UserPartnerUpdateRequest;
 use App\Http\Resources\UserPartnerShowResource;
 use App\Repositories\PartnerRepository;
@@ -86,12 +88,32 @@ class UserPartnerController extends Controller
             }
     }
 
-    public function approve(Request $request, int $id) {
+    public function approve(UserPartnerApproveRequest $request, int $id) {
         try {
             DB::beginTransaction();
 
             $data = $this->repository->update([
-                'is_approve' => true
+                'status' => Constants::PARTNER_STATUS_APPROVED
+            ],$id);
+
+            DB::commit();
+
+            return ($this->show($request, $data->id))->additional([
+                'success' => true,
+                'message' => 'Data approved.'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ExceptionService::responseJson($e);
+        }
+    }
+
+    public function reject(UserPartnerRejectedRequest $request, int $id) {
+        try {
+            DB::beginTransaction();
+
+            $data = $this->repository->update([
+                'status' => Constants::PARTNER_STATUS_REJECTED
             ],$id);
 
             DB::commit();

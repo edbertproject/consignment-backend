@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use App\Utils\Constants;
 
 /**
  * Class CreateProductsTable.
@@ -22,13 +23,14 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->unsignedBigInteger('price')->nullable();
 
-            // bid only`
+            // bid only
             $table->unsignedBigInteger('start_price')->nullable();
             $table->unsignedBigInteger('multiplied_price')->nullable();
             $table->unsignedBigInteger('desired_price')->nullable();
 
-            $table->timestamp('start_date')->nullable();
-            $table->unsignedDouble('weight')->default(1);
+            $table->timestamp('start_date');
+            $table->timestamp('end_date')->nullable();
+            $table->unsignedDouble('weight')->default(0);
             $table->unsignedBigInteger('quantity')->default(1);
             $table->unsignedDouble('long_dimension')->nullable();
             $table->unsignedDouble('wide_dimension')->nullable();
@@ -38,11 +40,7 @@ class CreateProductsTable extends Migration
             $table->text('description')->nullable();
 
             $table->text('cancel_reason')->nullable();
-
-            $table->boolean('is_active')->default(false);
-            $table->boolean('is_approve')->default(false);
-            $table->boolean('is_close')->default(false);
-            $table->boolean('is_cancel')->default(false);
+            $table->string('status')->default(Constants::PRODUCT_STATUS_WAITING_APPROVAL);
 
             $table->baseStamps();
 		});

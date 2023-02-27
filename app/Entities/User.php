@@ -109,7 +109,7 @@ class User extends BaseAuthenticatableModel
         if ($this->roles()
             ->where('role_id',Constants::ROLE_PARTNER_ID)
             ->exists()) {
-            return !$this->partner->is_approve;
+            return $this->partner->status === Constants::PARTNER_STATUS_WAITING_APPROVAL;
         }
 
         return false;
@@ -118,8 +118,8 @@ class User extends BaseAuthenticatableModel
     public function getStatusAttribute() {
         if ($this->roles()
             ->where('role_id',Constants::ROLE_PARTNER_ID)
-            ->exists() && !$this->partner->is_approve) {
-            return 'Waiting Approval';
+            ->exists()) {
+            return $this->partner->status;
         }
 
         if (!$this->is_active) {

@@ -60,5 +60,11 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::put('/product-category/{id}', ['uses' => 'ProductCategoriesController@update', 'middleware' => ['permission:write product category']]);
         Route::delete('/product-category/{id}', ['uses' => 'ProductCategoriesController@destroy', 'middleware' => ['permission:delete product category']]);
 
+        Route::get('/products', ['uses' => 'ProductsController@index', 'middleware' => ['permission:read product']]);
+        Route::post('/product', ['uses' => 'ProductsController@store', 'middleware' => ['permission:write product']]);
+        Route::get('/product/{id}', ['uses' => 'ProductsController@show', 'middleware' => ['permission:read product']]);
+        Route::put('/product/{id}', ['uses' => 'ProductsController@update', 'middleware' => ['permission:write product']]);
+        Route::delete('/product/{id}', ['uses' => 'ProductsController@destroy', 'middleware' => ['permission:delete product']]);
+        Route::put('/product/status/{id}', ['uses' => 'ProductsController@updateStatus', 'middleware' => ['permission:write product']]);
     });
 });

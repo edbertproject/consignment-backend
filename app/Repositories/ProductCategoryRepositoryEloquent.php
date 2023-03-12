@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Criteria\RestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\ProductCategoryRepository;
@@ -41,7 +42,7 @@ class ProductCategoryRepositoryEloquent extends BaseRepository implements Produc
      */
     public function boot()
     {
-        $this->pushCriteria(app(RequestCriteria::class));
+        $this->pushCriteria(app(RestCriteria::class));
     }
 
 }

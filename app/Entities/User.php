@@ -5,7 +5,8 @@ namespace App\Entities;
 use App\Entities\Base\BaseAuthenticatableModel;
 use App\Notifications\ResetPasswordRequestNotification;
 use App\Utils\Constants;
-use App\Utils\Traits\WithAbility;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class User extends BaseAuthenticatableModel
 {
@@ -58,10 +59,20 @@ class User extends BaseAuthenticatableModel
      */
     public $appends = [
         'status',
+        'total_cart',
         'can_update',
         'can_delete',
-        'can_approve'
+        'can_update_status'
     ];
+
+    /**
+     * @return MorphOne
+     */
+    public function photo()
+    {
+        return $this->morphOne(Media::class, 'model')
+            ->where('collection_name', 'photo');
+    }
 
     /**
      * Send email for reset password
@@ -73,12 +84,25 @@ class User extends BaseAuthenticatableModel
         $this->notify(new ResetPasswordRequestNotification($token));
     }
 
+    public function addresses() {
+        return $this->hasMany(UserAddress::class, 'user_id');
+    }
+
     public function userToken() {
         return $this->hasOne(UserToken::class, 'user_id');
     }
 
     public function partner() {
         return $this->hasOne(Partner::class, 'user_id');
+    }
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class,'user_id');
+    }
+
+    public function getTotalCartAttribute() {
+        return $this->carts()->count();
     }
 
     public function getTotalNotificationAttribute() {
@@ -105,11 +129,11 @@ class User extends BaseAuthenticatableModel
         return $this->getCanUpdateAttribute();
     }
 
-    public function getCanApproveAttribute() {
+    public function getCanUpdateStatusAttribute() {
         if ($this->roles()
             ->where('role_id',Constants::ROLE_PARTNER_ID)
             ->exists()) {
-            return $this->partner->status === Constants::PARTNER_STATUS_WAITING_APPROVAL;
+            return @$this->partner->status === Constants::PARTNER_STATUS_WAITING_APPROVAL;
         }
 
         return false;
@@ -119,7 +143,7 @@ class User extends BaseAuthenticatableModel
         if ($this->roles()
             ->where('role_id',Constants::ROLE_PARTNER_ID)
             ->exists()) {
-            return $this->partner->status;
+            return @$this->partner->status;
         }
 
         if (!$this->is_active) {

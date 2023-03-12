@@ -24,17 +24,24 @@ class DatabaseMacroServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Blueprint::macro('baseStamps', function(bool $withTimestamps = true, bool $withSoftDelete = true) {
+        Blueprint::macro('baseStamps', function(bool $withSoftDelete = true, bool $withTimestamps = true, bool $withUserstamps = true) {
             if ($withTimestamps) $this->timestamps();
             if ($withSoftDelete) $this->softDeletes();
-            $this->unsignedBigInteger('created_by')->nullable()->index();
-            $this->unsignedBigInteger('updated_by')->nullable()->index();
-            $this->unsignedBigInteger('deleted_by')->nullable()->index();
+            if ($withUserstamps) {
+                $this->unsignedBigInteger('created_by')->nullable()->index();
+                $this->unsignedBigInteger('updated_by')->nullable()->index();
+                $this->unsignedBigInteger('deleted_by')->nullable()->index();
+            }
         });
 
         Blueprint::macro('relation', function($column, $table, $nullable = true, $foreign='id') {
             $this->unsignedBigInteger($column)->nullable($nullable)->index();
             $this->foreign($column)->on($table)->references($foreign)->onUpdate('cascade');
+        });
+
+        Blueprint::macro('uuidRelation', function($column, $table, $nullable = true) {
+            $this->uuid($column)->nullable($nullable)->index();
+            $this->foreign($column)->on($table)->references('id')->onUpdate('cascade');
         });
     }
 }

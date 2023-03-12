@@ -26,6 +26,7 @@ class Constants
 
     const PAGE_PRIVACY_POLICY_ID = 10;
 
+    // PRODUCT
     const PRODUCT_CONDITION_BNIB = "Brand New In Box";
     const PRODUCT_CONDITION_BNOB = "Brand New Open Box";
     const PRODUCT_CONDITION_VGOOD = "Very Good Condition";
@@ -50,10 +51,12 @@ class Constants
     const PRODUCT_STATUS_SOLD = 'Sold';
     const PRODUCT_STATUS_CLOSED = 'Closed';
 
+    // PARTNER
     const PARTNER_STATUS_WAITING_APPROVAL = 'Waiting Approval';
     const PARTNER_STATUS_APPROVED = 'Approved';
     const PARTNER_STATUS_REJECTED = 'Rejected';
 
+    // ROLE
     const ROLE_SUPER_ADMIN_ID = 1;
     const ROLE_SUPER_ADMIN_CODE = "super_admin";
     const ROLE_SUPER_ADMIN = "Super Admin";
@@ -64,12 +67,42 @@ class Constants
     const ROLE_PUBLIC_CODE = 'public';
     const ROLE_PUBLIC = "Public";
 
+    // ORDER
+    const ORDER_STATUS_WAITING_PAYMENT = 'Waiting Payment';
+    const ORDER_STATUS_EXPIRED = 'Expired';
+    const ORDER_STATUS_PAID = 'Paid';
+    const ORDER_STATUS_PROCESS = 'Process';
+    const ORDER_STATUS_FINISH = 'Finish';
+    const ORDER_STATUS_CANCELED = 'Canceled';
+    const ORDER_PARTNER_STATUS_WAITING_CONFIRM = 'Waiting Confirm';
+    const ORDER_PARTNER_STATUS_PROCESSING = 'Processing';
+    const ORDER_PARTNER_STATUS_CANCELED = 'Canceled';
+    const ORDER_PARTNER_STATUS_ON_DELIVERY = 'On Delivery';
+    const ORDER_PARTNER_STATUS_COMPLETED = 'Completed';
+    const ORDER_USER_STATUS_PAID = 'Paid';
+    const ORDER_USER_STATUS_CANCELED = 'Canceled';
+    const ORDER_USER_STATUS_PROCESSED = 'Processed';
+    const ORDER_USER_STATUS_ON_DELIVERY = 'On Delivery';
+    const ORDER_USER_STATUS_ON_COMPLAINED = 'Complained';
+    const ORDER_USER_STATUS_COMPLETED = 'Completed';
+
+    // INVOICE
+    const PAYMENT_METHOD_TYPE_VIRTUAL_ACCOUNT = 'Virtual Account';
+    const PAYMENT_METHOD_TYPE_CREDIT_CARD = 'Credit Card';
+    const INVOICE_STATUS_PENDING = 'Pending';
+    const INVOICE_STATUS_PAID = 'Paid';
+    const INVOICE_STATUS_CANCELED = 'Canceled';
+    const INVOICE_EXPIRES = 60;
+    const INVOICE_FEE_PLATFORM_AMOUNT_PERCENTAGE = 10;
+
+    // XENDIT
+    const XENDIT_INVOICE_STATUS_PAID = 'PAID';
+    const XENDIT_INVOICE_STATUS_EXPIRED = 'EXPIRED';
     const XENDIT_FEE_VIRTUAL_ACCOUNT_AMOUNT = 4500;
-
     const XENDIT_FEE_CREDIT_CARD_AMOUNT = 2000;
-
     const XENDIT_FEE_CREDIT_CARD_PERCENTAGE = 2.9;
 
+    // PERMISSION
     const PERMISSION_RWD = ['read', 'write' ,'delete'];
     const PERMISSION_RW = ['read', 'write'];
     const PERMISSION_R = ['read'];

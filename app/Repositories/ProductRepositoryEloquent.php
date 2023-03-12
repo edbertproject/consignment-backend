@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Criteria\RestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\ProductRepository;
@@ -19,9 +20,9 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
     use CacheableRepository;
 
     protected $fieldSearchable = [
-        'category.name' => 'like',
+        'productCategory.name' => 'like',
         'type' => 'like',
-        'code' => 'like',
+        'name' => 'like',
     ];
 
     /**
@@ -41,7 +42,7 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
      */
     public function boot()
     {
-        $this->pushCriteria(app(RequestCriteria::class));
+        $this->pushCriteria(app(RestCriteria::class));
     }
 
 }

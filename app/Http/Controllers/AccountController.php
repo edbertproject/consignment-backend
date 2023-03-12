@@ -62,7 +62,7 @@ class AccountController extends Controller
 
             $data = Auth::user();
             $data->fill([
-                'password' => Hash::make($request->get('new_password')),
+                'password' => Hash::make($request->get('password')),
             ]);
             $data->save();
 

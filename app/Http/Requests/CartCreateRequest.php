@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\UserPartnerStatusRule;
+use App\Rules\CartProductRule;
+use App\Rules\CartQuantityRule;
+use App\Rules\NotPresent;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class UserPartnerApproveRequest extends FormRequest
+class CartCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +28,10 @@ class UserPartnerApproveRequest extends FormRequest
     public function rules()
     {
         return [
-            'status' => ['required', new UserPartnerStatusRule($this->id)]
+            'user_id' => 'required|exists:users,id,deleted_at,NULL',
+            'product_id' => ['required', 'exists:products,id,deleted_at,NULL', new CartProductRule($this->user_id)],
+            'quantity' => ['required', 'integer', 'not_in:0', new CartQuantityRule($this->product_id)],
+            'is_available' => ['sometimes', new NotPresent]
         ];
     }
 }

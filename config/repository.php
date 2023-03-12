@@ -220,6 +220,15 @@ return [
             'searchJoin' => 'search_join',
             'withCount' => 'with_count',
         ],
+
+        'sort_aliases' => [
+            'ascending' => 'asc',
+            'ascend' => 'asc',
+            'asc' => 'asc',
+            'descending' => 'desc',
+            'descend' => 'desc',
+            'desc' => 'desc',
+        ]
     ],
     /*
     |--------------------------------------------------------------------------

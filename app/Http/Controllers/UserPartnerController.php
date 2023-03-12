@@ -7,6 +7,7 @@ use App\Http\Requests\UserPartnerApproveRequest;
 use App\Http\Requests\UserPartnerCreateRequest;
 use App\Http\Requests\UserPartnerRejectedRequest;
 use App\Http\Requests\UserPartnerUpdateRequest;
+use App\Http\Requests\UserPartnerUpdateStatusRequest;
 use App\Http\Resources\UserPartnerShowResource;
 use App\Repositories\PartnerRepository;
 use App\Repositories\UserRepository;
@@ -88,39 +89,20 @@ class UserPartnerController extends Controller
             }
     }
 
-    public function approve(UserPartnerApproveRequest $request, int $id) {
+    public function updateStatus(UserPartnerUpdateStatusRequest $request, int $id) {
         try {
             DB::beginTransaction();
 
-            $data = $this->repository->update([
-                'status' => Constants::PARTNER_STATUS_APPROVED
+            $data = $this->repository->find($id);
+            $data->partner()->update([
+                'status' => $request->status
             ],$id);
 
             DB::commit();
 
             return ($this->show($request, $data->id))->additional([
                 'success' => true,
-                'message' => 'Data approved.'
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return ExceptionService::responseJson($e);
-        }
-    }
-
-    public function reject(UserPartnerRejectedRequest $request, int $id) {
-        try {
-            DB::beginTransaction();
-
-            $data = $this->repository->update([
-                'status' => Constants::PARTNER_STATUS_REJECTED
-            ],$id);
-
-            DB::commit();
-
-            return ($this->show($request, $data->id))->additional([
-                'success' => true,
-                'message' => 'Data approved.'
+                'message' => 'Data updated.'
             ]);
         } catch (Exception $e) {
             DB::rollBack();

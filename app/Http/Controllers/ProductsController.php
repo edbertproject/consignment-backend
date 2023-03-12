@@ -40,6 +40,7 @@ class ProductsController extends Controller
 
             $request->merge([
                 'status' => Constants::PRODUCT_STATUS_APPROVED,
+                'available_quantity' => $request->quantity
             ]);
 
             $data = $this->repository->create($request->all());
@@ -61,6 +62,10 @@ class ProductsController extends Controller
     public function update(ProductUpdateRequest $request, int $id) {
         try {
             DB::beginTransaction();
+
+            $request->merge([
+                'available_quantity' => $request->quantity
+            ]);
 
             $data = $this->repository->update($request->all(),$id);
 

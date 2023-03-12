@@ -28,6 +28,6 @@ class UserInternalCriteria implements CriteriaInterface
                 Constants::ROLE_PUBLIC_ID,
                 Constants::ROLE_PARTNER_ID,
             ]);
-        });
+        })->where('id','!=',1);
     }
 }

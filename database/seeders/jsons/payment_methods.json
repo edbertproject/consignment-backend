@@ -1,0 +1,305 @@
+[
+    {
+        "type": "Virtual Account",
+        "code": "BCA",
+        "name": "BCA Virtual Account",
+        "description": "Only accept payment from Bank BCA",
+        "logo_id": null,
+        "xendit_code": "BCA",
+        "payment_method_instructions": [
+            {
+                "title": "ATM BCA",
+                "instructions": [
+                    "Insert your BCA ATM card and PIN",
+                    "Select Menu 'Other Transaction' > Select 'Transfer' > Select 'To BCA Virtual Account'",
+                    "Enter Virtual Account Number",
+                    "Verify Virtual Account details",
+                    "Enter amount to be transferred > Select 'Correct' to confirm",
+                    "Confirm your transaction details displayed",
+                    "Select 'Yes' if the details are correct or 'No' if the details are not correct"
+                ]
+            },
+            {
+                "title": "m-BCA (BCA Mobile)",
+                "instructions": [
+                    "Log in to the BCA Mobile application",
+                    "Select the m-BCA menu > Select m-Transfer > BCA Virtual Account",
+                    "Enter your Virtual Account Number 700701589960110512 > Press 'OK'",
+                    "Click on 'Send' button at the top right corner to proceed",
+                    "Click 'OK' to proceed",
+                    "Enter your PIN to authorize the transaction"
+                ]
+            },
+            {
+                "title": "Internet Banking BCA",
+                "instructions": [
+                    "Login to KlikBCA Individual https://ibank.klikbca.com",
+                    "Select 'Transfer' > Select 'Transfer to BCA Virtual Account'",
+                    "Enter the Virtual Account Number",
+                    "Select 'Continue' to proceed your payment",
+                    "Enter 'RESPON KEYBCA APPLI 1' shown in your BCA Token > Click on the 'Send' button",
+                    "Enter the authentication token code"
+                ]
+            }
+        ]
+    },
+    {
+        "type": "Virtual Account",
+        "code": "MANDIRI",
+        "name": "Mandiri Virtual Account",
+        "description": "Only accept payment from Bank Mandiri",
+        "logo_id": null,
+        "xendit_code": "MANDIRI",
+        "payment_method_instructions": [
+            {
+                "title": "ATM MANDIRI",
+                "instructions": [
+                    "Insert your ATM card > Enter PIN > Select 'ENTER'",
+                    "Select 'PAYMENT' > Select 'MULTI PAYMENT'",
+                    "Enter company code '88908' > Enter Virtual Account Number > Press 'CORRECT'",
+                    "Merchant details will be displayed, choose number 1 according to the amount billed and then press 'YES'",
+                    "Payment confirmation will be displayed. Select 'YES', to proceed",
+                    "Keep your receipt as proof of payment"
+                ]
+            },
+            {
+                "title": "m-Banking (New Livin by MANDIRI)",
+                "instructions": [
+                    "Open Livin by Mandiri > Enter your PASSWORD or do face verification",
+                    "Select 'Payment' > Search “Xendit 88908”",
+                    "Select Xendit 88908 as service provider > Enter your Virtual Account Number",
+                    "Review and confirm the transaction details",
+                    "Complete the transaction by entering your MPIN",
+                    "Upon successful payment, save the transaction receipt or screenshot the screen as a proof of payment"
+                ]
+            },
+            {
+                "title": "Internet Banking MANDIRI",
+                "instructions": [
+                    "Go to Mandiri Internet Banking website https://ibank.bankmandiri.co.id",
+                    "Login with your USER ID and PASSWORD",
+                    "Go to the Home page > Select 'Payment' > Select 'Multi Payment'",
+                    "Select 88908 XENDIT as service provider",
+                    "Enter your Virtual Account Number > Press continue",
+                    "If all details are correct > Click on 'CONFIRM' > Enter PIN / Challenge Code Token",
+                    "Upon successful payment, save the transaction receipt or screenshot the screen as a proof of payment"
+                ]
+            }
+        ]
+    },
+    {
+        "type": "Virtual Account",
+        "code": "BNI",
+        "name": "BNI Virtual Account",
+        "description": "Only accept payment from Bank BNI",
+        "logo_id": null,
+        "xendit_code": "BNI",
+        "payment_method_instructions": [
+            {
+                "title": "ATM BNI",
+                "instructions": [
+                    "Insert your ATM card and PIN",
+                    "Select 'Other Transaction' > Select 'Transfer' > Select the type of account you are using to transfer (i.e. from Savings account)",
+                    "Choose 'Virtual Account Billing'",
+                    "Enter virtual account number",
+                    "The amount billed will show on the screen > Confirm the transaction, if it's correct then continue",
+                    "Your transaction is completed"
+                ]
+            },
+            {
+                "title": "Mobile Banking BNI",
+                "instructions": [
+                    "Enter your User ID and Password",
+                    "Select the menu 'Transfer' > Select the menu 'Virtual Account Billing' > Choose debit account",
+                    "Enter your Virtual Account Number",
+                    "The amount billed will show on the screen > Confirm the transaction and enter your password",
+                    "Your transaction is completed"
+                ]
+            },
+            {
+                "title": "Internet Banking BNI",
+                "instructions": [
+                    "Enter the following address https://ibank.bni.co.id > Click Enter",
+                    "Enter your User ID and Password",
+                    "Select the menu 'Transfer' > Select the menu 'Virtual Account Billing'",
+                    "Enter your Virtual Account number",
+                    "Choose the type of account you are using to transfer and press 'Continue'",
+                    "The amount billed will show on the screen > Enter the authentication token code",
+                    "Your transaction is completed"
+                ]
+            }
+        ]
+    },
+    {
+        "type": "Virtual Account",
+        "code": "BRI",
+        "name": "BRI Virtual Account",
+        "description": "Only accept payment from Bank BRI",
+        "logo_id": null,
+        "xendit_code": "BRI",
+        "payment_method_instructions": [
+            {
+                "title": "ATM BRI",
+                "instructions": [
+                    "Insert the card > Select the language > Enter your PIN",
+                    "Select 'Other Menu' > Select 'Payment'",
+                    "Select 'Other Payment' > Select 'Briva'",
+                    "Enter virtual account number and the nominal that you want to pay",
+                    "Check the transaction data and press 'YES'",
+                    "Your transaction is completed"
+                ]
+            },
+            {
+                "title": "Mobile Banking BRI",
+                "instructions": [
+                    "Enter your User ID and PIN",
+                    "Select 'Payment' > Select 'Briva'",
+                    "Enter your Virtual Account Number and the amount that you want to pay",
+                    "Input your PIN > Click 'Send'",
+                    "Your transaction is completed"
+                ]
+            },
+            {
+                "title": "Internet Banking BRI",
+                "instructions": [
+                    "Login to https://ib.bri.co.id/ib-bri/",
+                    "Enter your User ID and Password",
+                    "Select 'Payment' > Select 'Briva'",
+                    "Enter your Virtual Account Number > Enter the amount that you want to pay > Click Send",
+                    "Enter your password again along with the authentication code from internet bank mToken",
+                    "Your transaction is completed"
+                ]
+            }
+        ]
+    },
+    {
+        "type": "Virtual Account",
+        "code": "PERMATA",
+        "name": "Permata Virtual Account",
+        "description": "Only accept payment from Bank Permata",
+        "logo_id": null,
+        "xendit_code": "PERMATA",
+        "payment_method_instructions": [
+            {
+                "title": "ATM PERMATA",
+                "instructions": [
+                    "Insert your Permata ATM card > Enter your  ATM PIN",
+                    "Select Menu 'Transaksi Lainnya' > Select 'Transfer'",
+                    "Select 'Transfer Antar Rekening Permata Bank'",
+                    "Enter Virtual Account Number",
+                    "Select the type of account you are using to transfer (i.e. from Savings account)",
+                    "Confirm your transaction details displayed"
+                ]
+            },
+            {
+                "title": "Mobile Banking PERMATA",
+                "instructions": [
+                    "Open Permata Application",
+                    "Select 'Transfer' > Select 'Rekening PermataBank'",
+                    "Enter your Virtual Account Number",
+                    "Enter the authentication token",
+                    "Your transaction is completed"
+                ]
+            },
+            {
+                "title": "Internet Banking PERMATA",
+                "instructions": [
+                    "Open https://new.permatanet.com and login",
+                    "Choose 'Pembayaran' > Choose 'Pembayaran Tagihan' > Choose 'Virtual Account'",
+                    "Choose your source of payment > Choose 'Masukkan Daftar Tagihan Baru'",
+                    "Enter your Virtual Account Number > Check your detail information and proceed",
+                    "Enter SMS token response code",
+                    "Your transaction is completed"
+                ]
+            }
+        ]
+    },
+    {
+        "type": "Credit Card",
+        "code": "VISA",
+        "name": "VISA",
+        "description": "Only accept payment from VISA Card",
+        "logo_id": null,
+        "xendit_code": "VISA",
+        "payment_method_instructions": [
+            {
+                "title": "ATM BCA",
+                "instructions": [
+                    "Insert your BCA ATM card and PIN",
+                    "Select Menu 'Other Transaction' > Select 'Transfer' > Select 'To BCA Virtual Account'",
+                    "Enter Virtual Account Number",
+                    "Verify Virtual Account details",
+                    "Enter amount to be transferred > Select 'Correct' to confirm",
+                    "Confirm your transaction details displayed",
+                    "Select 'Yes' if the details are correct or 'No' if the details are not correct"
+                ]
+            },
+            {
+                "title": "m-BCA (BCA Mobile)",
+                "instructions": [
+                    "Log in to the BCA Mobile application",
+                    "Select the m-BCA menu > Select m-Transfer > BCA Virtual Account",
+                    "Enter your Virtual Account Number 700701589960110512 > Press 'OK'",
+                    "Click on 'Send' button at the top right corner to proceed",
+                    "Click 'OK' to proceed",
+                    "Enter your PIN to authorize the transaction"
+                ]
+            },
+            {
+                "title": "Internet Banking BCA",
+                "instructions": [
+                    "Login to KlikBCA Individual https://ibank.klikbca.com",
+                    "Select 'Transfer' > Select 'Transfer to BCA Virtual Account'",
+                    "Enter the Virtual Account Number",
+                    "Select 'Continue' to proceed your payment",
+                    "Enter 'RESPON KEYBCA APPLI 1' shown in your BCA Token > Click on the 'Send' button",
+                    "Enter the authentication token code"
+                ]
+            }
+        ]
+    },
+    {
+        "type": "Credit Card",
+        "code": "MASTERCARD",
+        "name": "Master Card",
+        "description": "Only accept payment from Master Card",
+        "logo_id": null,
+        "xendit_code": "MASTERCARD",
+        "payment_method_instructions": [
+            {
+                "title": "ATM BCA",
+                "instructions": [
+                    "Insert your BCA ATM card and PIN",
+                    "Select Menu 'Other Transaction' > Select 'Transfer' > Select 'To BCA Virtual Account'",
+                    "Enter Virtual Account Number",
+                    "Verify Virtual Account details",
+                    "Enter amount to be transferred > Select 'Correct' to confirm",
+                    "Confirm your transaction details displayed",
+                    "Select 'Yes' if the details are correct or 'No' if the details are not correct"
+                ]
+            },
+            {
+                "title": "m-BCA (BCA Mobile)",
+                "instructions": [
+                    "Log in to the BCA Mobile application",
+                    "Select the m-BCA menu > Select m-Transfer > BCA Virtual Account",
+                    "Enter your Virtual Account Number 700701589960110512 > Press 'OK'",
+                    "Click on 'Send' button at the top right corner to proceed",
+                    "Click 'OK' to proceed",
+                    "Enter your PIN to authorize the transaction"
+                ]
+            },
+            {
+                "title": "Internet Banking BCA",
+                "instructions": [
+                    "Login to KlikBCA Individual https://ibank.klikbca.com",
+                    "Select 'Transfer' > Select 'Transfer to BCA Virtual Account'",
+                    "Enter the Virtual Account Number",
+                    "Select 'Continue' to proceed your payment",
+                    "Enter 'RESPON KEYBCA APPLI 1' shown in your BCA Token > Click on the 'Send' button",
+                    "Enter the authentication token code"
+                ]
+            }
+        ]
+    }
+]

@@ -2,11 +2,13 @@
 
 namespace App\Repositories;
 
+use App\Criteria\RestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\CityRepository;
 use App\Entities\City;
 use App\Validators\CityValidator;
+use Prettus\Repository\Traits\CacheableRepository;
 
 /**
  * Class CityRepositoryEloquent.
@@ -15,6 +17,12 @@ use App\Validators\CityValidator;
  */
 class CityRepositoryEloquent extends BaseRepository implements CityRepository
 {
+    use CacheableRepository;
+
+    protected $fieldSearchable = [
+        'name'
+    ];
+
     /**
      * Specify Model class name
      *
@@ -25,14 +33,14 @@ class CityRepositoryEloquent extends BaseRepository implements CityRepository
         return City::class;
     }
 
-    
+
 
     /**
      * Boot up the repository, pushing criteria
      */
     public function boot()
     {
-        $this->pushCriteria(app(RequestCriteria::class));
+        $this->pushCriteria(app(RestCriteria::class));
     }
-    
+
 }

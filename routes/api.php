@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::group(['middleware' => 'verify_xendit_token'], function () {
+    Route::post('xendit/invoice', 'XenditController@invoice')->name('xendit.invoice');
+    Route::post('xendit/virtual-account', 'XenditController@virtualAccount')->name('xendit.virtual-account');
+    Route::post('xendit/virtual-account/update', 'XenditController@virtualAccountUpdate')->name('xendit.virtual-account-update');
+});
+
 Route::group(['namespace' => 'Auth'], function () {
     Route::post('register', 'RegisterController@store')->name('register');
     Route::post('register/verify', 'RegisterController@verify')->name('register.verify');
@@ -22,25 +28,45 @@ Route::group(['namespace' => 'Auth'], function () {
 });
 
 Route::group(['middleware' => ['auth:api']], function () {
-    Route::group(['prefix' => 'notification'], function () {
-        Route::get('/','NotificationController@index')->name('index');
-        Route::get('/{id}', 'NotificationController@show')->name('show');
-        Route::post('/read-all', 'NotificationController@readAll')->name('read-all');
-    });
-
     Route::group(['prefix' => 'account'], function () {
         Route::get('/', 'AccountController@account')->name('account.index');
         Route::post('/', 'AccountController@update')->name('account.update');
         Route::post('/update-password', 'AccountController@updatePassword')->name('account.update-password');
         Route::post('/logout', 'AccountController@revoke')->name('account.logout');
-        Route::get('/permission', 'AccountController@permission')->name('account.permission');
-        Route::get('/notification/read-all', 'AccountController@readAllNotification')->name('account.notification.read');
+
+        Route::group(['prefix' => 'notification'], function () {
+            Route::get('/','NotificationController@index')->name('index');
+            Route::get('/{id}', 'NotificationController@show')->name('show');
+            Route::post('/read-all', 'NotificationController@readAll')->name('read-all');
+        });
+    });
+
+    Route::group(['namespace' => 'Public'], function () {
+        Route::apiResource('cart', 'CartsController')->parameters(['cart' => 'id'])->only(['index', 'store', 'update', 'destroy']);
+        Route::apiResource('order', 'OrdersController')->parameters(['order' => 'id'])->except(['destroy']);
+
+        Route::apiResource('payment-method', 'PaymentMethodsController')->parameters(['payment-method' => 'id'])->only(['index', 'show']);
     });
 
     Route::group(['prefix' => 'admin', 'middleware' => ['ensure_not_role:Public|Partner']], function () {
+        Route::group(['prefix' => 'select'], function () {
+            Route::get('/product-categories', ['uses' => 'ProductCategoriesController@select', 'middleware' => ['permission:read product category']]);
+            Route::get('/provinces', ['uses' => 'ProvincesController@select']);
+            Route::get('/cities', ['uses' => 'CitiesController@select']);
+            Route::get('/districts', ['uses' => 'DistrictsController@select']);
+            Route::get('/roles', ['uses' => 'RolesController@select', 'middleware' => ['permission:read role']]);
+            Route::get('/permissions', ['uses' => 'PermissionsController@select', 'middleware' => ['permission:read role']]);
+        });
 
         Route::get('/user-public', ['uses' => 'UserPublicController@index', 'middleware' => ['permission:read user public']]);
         Route::get('/user-public/{id}', ['uses' => 'UserPublicController@show', 'middleware' => ['permission:read user public']]);
+
+        Route::get('/user-partner', ['uses' => 'UserPartnerController@index', 'middleware' => ['permission:read user partner']]);
+        Route::post('/user-partner', ['uses' => 'UserPartnerController@store', 'middleware' => ['permission:write user partner']]);
+        Route::get('/user-partner/{id}', ['uses' => 'UserPartnerController@show', 'middleware' => ['permission:read user partner']]);
+        Route::put('/user-partner/{id}', ['uses' => 'UserPartnerController@update', 'middleware' => ['permission:write user partner']]);
+        Route::delete('/user-partner/{id}', ['uses' => 'UserPartnerController@destroy', 'middleware' => ['permission:delete user partner']]);
+        Route::put('/user-partner/status/{id}', ['uses' => 'UserPartnerController@updateStatus', 'middleware' => ['permission:write user partner']]);
 
         Route::get('/user-internal', ['uses' => 'UserInternalController@index', 'middleware' => ['permission:read user internal']]);
         Route::post('/user-internal', ['uses' => 'UserInternalController@store', 'middleware' => ['permission:write user internal']]);

@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Criteria\RestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\UserAddressRepository;
@@ -25,14 +26,14 @@ class UserAddressRepositoryEloquent extends BaseRepository implements UserAddres
         return UserAddress::class;
     }
 
-    
+
 
     /**
      * Boot up the repository, pushing criteria
      */
     public function boot()
     {
-        $this->pushCriteria(app(RequestCriteria::class));
+        $this->pushCriteria(app(RestCriteria::class));
     }
-    
+
 }

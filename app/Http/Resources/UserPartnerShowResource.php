@@ -14,6 +14,12 @@ class UserPartnerShowResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return array_merge(parent::toArray($request), [
+            'full_address' => @$this->partner->full_address,
+            'postal_code' => @$this->partner->postal_code,
+            'province' => @$this->partner->province,
+            'city' => @$this->partner->city,
+            'district' => @$this->partner->district,
+        ]);
     }
 }

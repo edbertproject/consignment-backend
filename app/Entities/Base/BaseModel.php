@@ -11,5 +11,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Wildside\Userstamps\Userstamps;
 
 class BaseModel extends Model implements Transformable, Auditable, HasMedia {
-    use TransformableTrait, InteractsWithMedia, \OwenIt\Auditing\Auditable, Userstamps;
+    use TransformableTrait,
+        InteractsWithMedia,
+        \OwenIt\Auditing\Auditable,
+        Userstamps;
 }

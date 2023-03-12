@@ -35,7 +35,7 @@ class UserInternalUpdateRequest extends FormRequest
             'email' => ['required', 'email', 'unique:users,email,'.$this->id.',id,deleted_at,NULL'],
             'phone_number' => ['required', 'numeric'],
             'password' => ['required', 'string', Password::min(8)->letters()->numbers()->symbols()],
-            'photo' => array_merge(['nullable'], MediaService::fileRule(['image'])),
+            'photo' => array_merge(['nullable']),
             'role_id' => ['required', 'exists:roles,id,deleted_at,NULL', new UserInternalRoleRule],
         ];
     }

@@ -2,18 +2,17 @@
 
 namespace App\Rules;
 
-use App\Entities\User;
-use App\Utils\Constants;
+use App\Entities\Product;
 use Illuminate\Contracts\Validation\Rule;
 
-class UserPartnerStatusRule implements Rule
+class CartQuantityRule implements Rule
 {
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct(protected $id)
+    public function __construct(protected $productId)
     {
         //
     }
@@ -27,9 +26,9 @@ class UserPartnerStatusRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $partner = User::find($this->id)->partner;
+        $product = Product::find($this->productId);
 
-        return $partner->status === Constants::PARTNER_STATUS_WAITING_APPROVAL;
+        return $value <= $product->available_quantity;
     }
 
     /**
@@ -39,6 +38,6 @@ class UserPartnerStatusRule implements Rule
      */
     public function message()
     {
-        return 'Status can not be updated.';
+        return 'Quantity can not be more than available quantity.';
     }
 }

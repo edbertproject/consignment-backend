@@ -20,6 +20,22 @@ class UserAddress extends Model implements Transformable
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'user_id',
+        'label',
+        'receiver_name',
+        'phone_number',
+        'full_address',
+        'postal_code',
+        'province_id',
+        'city_id',
+        'district_id',
+        'note',
+        'is_primary',
+    ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 
 }

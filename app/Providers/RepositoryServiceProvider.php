@@ -35,6 +35,14 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\UserAddressRepository::class, \App\Repositories\UserAddressRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ProductCategoryRepository::class, \App\Repositories\ProductCategoryRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ProductRepository::class, \App\Repositories\ProductRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\PermissionRepository::class, \App\Repositories\PermissionRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\CartRepository::class, \App\Repositories\CartRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\OrderRepository::class, \App\Repositories\OrderRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\InvoiceRepository::class, \App\Repositories\InvoiceRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\PaymentMethodRepository::class, \App\Repositories\PaymentMethodRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\PaymentMethodInstructionRepository::class, \App\Repositories\PaymentMethodInstructionRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\ApiExternaLogRepository::class, \App\Repositories\ApiExternaLogRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\ApiExternalLogRepository::class, \App\Repositories\ApiExternalLogRepositoryEloquent::class);
         //:end-bindings:
     }
 }

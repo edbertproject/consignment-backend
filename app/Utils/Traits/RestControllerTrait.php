@@ -2,6 +2,7 @@
 
 namespace App\Utils\Traits;
 
+use App\Criteria\RestCriteria;
 use App\Http\Resources\BaseResource;
 use App\Services\ExceptionService;
 use Illuminate\Http\Request;
@@ -23,8 +24,6 @@ trait RestControllerTrait
 
     public function index(Request $request)
     {
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
         foreach ($this->indexCriterias as $indexCriteria) {
             $this->repository->pushCriteria(new $indexCriteria($request));
         }
@@ -34,8 +33,6 @@ trait RestControllerTrait
 
     public function select(Request $request)
     {
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
         if (empty($this->selectCriterias)) {
             foreach ($this->indexCriterias as $indexCriteria) {
                 $this->repository->pushCriteria(new $indexCriteria($request));
@@ -49,15 +46,13 @@ trait RestControllerTrait
         return $this->indexResource::collection($this->repository->paginate($request->per_page));
     }
 
-    public function show(Request $request, int $id): BaseResource
+    public function show(Request $request, int $id)
     {
         foreach ($this->indexCriterias as $indexCriteria) {
             $this->repository->pushCriteria(new $indexCriteria($request));
         }
 
-        $user = $this->repository->scopeQuery(function($query){
-                return $query->withTrashed();
-            })->find($id);
+        $user = $this->repository->find($id);
 
         return new $this->showResource($user);
     }

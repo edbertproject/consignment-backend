@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Criteria\UserInternalCriteria;
 use App\Http\Requests\UserInternalCreateRequest;
 use App\Http\Requests\UserInternalUpdateRequest;
+use App\Http\Resources\UserInternalShowResource;
 use App\Repositories\UserRepository;
 use App\Services\ExceptionService;
 use App\Services\MediaService;
@@ -30,6 +31,8 @@ class UserInternalController extends Controller
         $this->indexCriterias = [
             UserInternalCriteria::class
         ];
+
+        $this->showResource = UserInternalShowResource::class;
     }
 
     public function store(UserInternalCreateRequest $request) {

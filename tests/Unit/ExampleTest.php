@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Entities\Invoice;
+use App\Services\NumberSettingService;
 use PHPUnit\Framework\TestCase;
 
 class ExampleTest extends TestCase
@@ -13,6 +15,6 @@ class ExampleTest extends TestCase
      */
     public function test_that_true_is_true()
     {
-        $this->assertTrue(true);
+        print_r(NumberSettingService::generate(Invoice::class));
     }
 }

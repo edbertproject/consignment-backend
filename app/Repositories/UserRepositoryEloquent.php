@@ -2,15 +2,19 @@
 
 namespace App\Repositories;
 
+use App\Criteria\RestCriteria;
 use App\Entities\User;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
+use Prettus\Repository\Traits\CacheableRepository;
 
 /**
  * Class UserRepositoryRepositoryEloquent.
  */
 class UserRepositoryEloquent extends BaseRepository implements UserRepository
 {
+    use CacheableRepository;
+
     protected $fieldSearchable = [
         'name',
         'email'
@@ -31,6 +35,6 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
      */
     public function boot()
     {
-        $this->pushCriteria(app(RequestCriteria::class));
+        $this->pushCriteria(app(RestCriteria::class));
     }
 }

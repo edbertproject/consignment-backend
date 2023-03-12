@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Criteria\RestCriteria;
 use App\Entities\Role;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
@@ -34,6 +35,6 @@ class RoleRepositoryEloquent extends BaseRepository implements RoleRepository
      */
     public function boot()
     {
-        $this->pushCriteria(app(RequestCriteria::class));
+        $this->pushCriteria(app(RestCriteria::class));
     }
 }

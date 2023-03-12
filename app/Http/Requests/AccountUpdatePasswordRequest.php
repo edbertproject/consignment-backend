@@ -31,7 +31,14 @@ class AccountUpdatePasswordRequest extends FormRequest
                 'string',
                 new ValidPassword()
             ],
-            'new_password' => ['required', 'string', Password::min(8)->letters()->numbers()->symbols()]
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->numbers()->symbols()]
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'old_password' => 'old password'
         ];
     }
 }

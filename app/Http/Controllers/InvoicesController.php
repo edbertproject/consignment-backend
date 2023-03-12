@@ -7,35 +7,35 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
-use App\Http\Requests\PartnerCreateRequest;
-use App\Http\Requests\PartnerUpdateRequest;
-use App\Repositories\PartnerRepository;
-use App\Validators\PartnerValidator;
+use App\Http\Requests\InvoiceCreateRequest;
+use App\Http\Requests\InvoiceUpdateRequest;
+use App\Repositories\InvoiceRepository;
+use App\Validators\InvoiceValidator;
 
 /**
- * Class PartnersController.
+ * Class InvoicesController.
  *
  * @package namespace App\Http\Controllers;
  */
-class PartnersController extends Controller
+class InvoicesController extends Controller
 {
     /**
-     * @var PartnerRepository
+     * @var InvoiceRepository
      */
     protected $repository;
 
     /**
-     * @var PartnerValidator
+     * @var InvoiceValidator
      */
     protected $validator;
 
     /**
-     * PartnersController constructor.
+     * InvoicesController constructor.
      *
-     * @param PartnerRepository $repository
-     * @param PartnerValidator $validator
+     * @param InvoiceRepository $repository
+     * @param InvoiceValidator $validator
      */
-    public function __construct(PartnerRepository $repository, PartnerValidator $validator)
+    public function __construct(InvoiceRepository $repository, InvoiceValidator $validator)
     {
         $this->repository = $repository;
         $this->validator  = $validator;
@@ -49,38 +49,38 @@ class PartnersController extends Controller
     public function index()
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $partners = $this->repository->all();
+        $invoices = $this->repository->all();
 
         if (request()->wantsJson()) {
 
             return response()->json([
-                'data' => $partners,
+                'data' => $invoices,
             ]);
         }
 
-        return view('partners.index', compact('partners'));
+        return view('invoices.index', compact('invoices'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  PartnerCreateRequest $request
+     * @param  InvoiceCreateRequest $request
      *
      * @return \Illuminate\Http\Response
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function store(PartnerCreateRequest $request)
+    public function store(InvoiceCreateRequest $request)
     {
         try {
 
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
 
-            $partner = $this->repository->create($request->all());
+            $invoice = $this->repository->create($request->all());
 
             $response = [
-                'message' => 'Partner created.',
-                'data'    => $partner->toArray(),
+                'message' => 'Invoice created.',
+                'data'    => $invoice->toArray(),
             ];
 
             if ($request->wantsJson()) {
@@ -110,16 +110,16 @@ class PartnersController extends Controller
      */
     public function show($id)
     {
-        $partner = $this->repository->find($id);
+        $invoice = $this->repository->find($id);
 
         if (request()->wantsJson()) {
 
             return response()->json([
-                'data' => $partner,
+                'data' => $invoice,
             ]);
         }
 
-        return view('partners.show', compact('partner'));
+        return view('invoices.show', compact('invoice'));
     }
 
     /**
@@ -131,32 +131,32 @@ class PartnersController extends Controller
      */
     public function edit($id)
     {
-        $partner = $this->repository->find($id);
+        $invoice = $this->repository->find($id);
 
-        return view('partners.edit', compact('partner'));
+        return view('invoices.edit', compact('invoice'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  PartnerUpdateRequest $request
+     * @param  InvoiceUpdateRequest $request
      * @param  string            $id
      *
      * @return Response
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function update(PartnerUpdateRequest $request, $id)
+    public function update(InvoiceUpdateRequest $request, $id)
     {
         try {
 
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
 
-            $partner = $this->repository->update($request->all(), $id);
+            $invoice = $this->repository->update($request->all(), $id);
 
             $response = [
-                'message' => 'Partner updated.',
-                'data'    => $partner->toArray(),
+                'message' => 'Invoice updated.',
+                'data'    => $invoice->toArray(),
             ];
 
             if ($request->wantsJson()) {
@@ -194,11 +194,11 @@ class PartnersController extends Controller
         if (request()->wantsJson()) {
 
             return response()->json([
-                'message' => 'Partner deleted.',
+                'message' => 'Invoice deleted.',
                 'deleted' => $deleted,
             ]);
         }
 
-        return redirect()->back()->with('message', 'Partner deleted.');
+        return redirect()->back()->with('message', 'Invoice deleted.');
     }
 }

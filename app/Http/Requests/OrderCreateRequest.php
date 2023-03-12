@@ -31,6 +31,11 @@ class OrderCreateRequest extends FormRequest
         $rules['payment_method_id'] = ['required', 'exists:payment_methods,id,deleted_at,NULL,is_enabled,1'];
         $rules['user_address_id'] = ['required', 'exists:user_addresses,id,deleted_at,NULL,user_id,'.Auth::user()->id];
 
+        $rules['courier_code'] = 'required|in:JNE,POS,TIKI';
+        $rules['courier_service'] = 'required|string';
+        $rules['courier_cost'] = 'required|integer';
+        $rules['courier_esd'] = 'required|string';
+
         $isCreditDebitCard = PaymentMethod::query()
             ->where('id', $this->get('payment_method_id'))
             ->where('type', Constants::PAYMENT_METHOD_TYPE_CREDIT_CARD)

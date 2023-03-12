@@ -46,6 +46,8 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::apiResource('order', 'OrdersController')->parameters(['order' => 'id'])->except(['destroy']);
 
         Route::apiResource('payment-method', 'PaymentMethodsController')->parameters(['payment-method' => 'id'])->only(['index', 'show']);
+
+        Route::post('shipping/calculate', ['uses' => 'ShippingsController@calculate']);
     });
 
     Route::group(['prefix' => 'admin', 'middleware' => ['ensure_not_role:Public|Partner']], function () {

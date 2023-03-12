@@ -102,6 +102,17 @@ class Constants
     const XENDIT_FEE_CREDIT_CARD_AMOUNT = 2000;
     const XENDIT_FEE_CREDIT_CARD_PERCENTAGE = 2.9;
 
+    // RAJA ONGKIR
+    const RAJA_ONGKIR_COURIER_JNE = 'jne';
+    const RAJA_ONGKIR_COURIER_POS = 'pos';
+    const RAJA_ONGKIR_COURIER_TIKI = 'tiki';
+    const RAJA_ONGKIR_COURIERS = [
+        self::RAJA_ONGKIR_COURIER_JNE,
+        self::RAJA_ONGKIR_COURIER_POS,
+        self::RAJA_ONGKIR_COURIER_TIKI
+    ];
+    const RAJA_ONGKIR_DEFAULT_CITY_ID = 456;
+
     // PERMISSION
     const PERMISSION_RWD = ['read', 'write' ,'delete'];
     const PERMISSION_RW = ['read', 'write'];

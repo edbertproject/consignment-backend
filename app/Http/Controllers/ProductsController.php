@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Criteria\ProductCriteria;
+use App\Criteria\UserInternalCriteria;
 use App\Http\Resources\BaseResource;
 use App\Repositories\UserRepository;
 use App\Services\ExceptionService;
@@ -12,6 +14,7 @@ use App\Utils\Traits\RestControllerTrait;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
@@ -32,6 +35,10 @@ class ProductsController extends Controller
 
     public function __construct(ProductRepository $repository) {
         $this->__rest($repository);
+
+        $this->indexCriterias = [
+            ProductCriteria::class
+        ];
     }
 
     public function store(ProductCreateRequest $request) {
@@ -42,6 +49,13 @@ class ProductsController extends Controller
                 'status' => Constants::PRODUCT_STATUS_APPROVED,
                 'available_quantity' => $request->quantity
             ]);
+
+            if (Auth::user()->hasRole(Constants::ROLE_PARTNER_ID)) {
+                $request->merge([
+                    'status' => Constants::PRODUCT_STATUS_WAITING_APPROVAL,
+                    'partner_id' => Auth::id()
+                ]);
+            }
 
             $data = $this->repository->create($request->all());
 
@@ -88,8 +102,7 @@ class ProductsController extends Controller
             DB::beginTransaction();
 
             $data = $this->repository->update([
-                'status' => $request->get('status'),
-                'cancel_reason' => $request->get('cancel_reason')
+                'status' => $request->get('status')
             ],$id);
 
             DB::commit();
@@ -97,6 +110,35 @@ class ProductsController extends Controller
             return ($this->show($request, $data->id))->additional([
                 'success' => true,
                 'message' => 'Data status updated.'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ExceptionService::responseJson($e);
+        }
+    }
+
+    public function cancel(Requests\ProductCancelRequest $request, int $id) {
+        try {
+            DB::beginTransaction();
+
+            $entity = $this->repository->find($id);
+
+            if ($entity->status === Constants::PRODUCT_STATUS_WAITING_APPROVAL) {
+                $entity->update([
+                    'status' => Constants::PRODUCT_STATUS_CANCEL_APPROVED,
+                ]);
+            } else {
+                $entity->update([
+                    'status' => Constants::PRODUCT_STATUS_WAITING_CANCEL_APPROVAL,
+                    'cancel_reason' => $request->get('cancel_reason')
+                ]);
+            }
+
+            DB::commit();
+
+            return ($this->show($request, $entity->id))->additional([
+                'success' => true,
+                'message' => 'Data updated.'
             ]);
         } catch (Exception $e) {
             DB::rollBack();

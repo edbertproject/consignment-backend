@@ -17,7 +17,7 @@ class ProductUpdateStatusRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::check();
+        return !Auth::user()->hasRole(Constants::ROLE_PARTNER_ID);
     }
 
     /**
@@ -29,9 +29,11 @@ class ProductUpdateStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::in([
-                Constants::PRODUCT_STATUS_APPROVED,Constants::PRODUCT_STATUS_CANCELED,
-                Constants::PRODUCT_STATUS_REJECTED,Constants::PRODUCT_STATUS_CLOSED])],
-            'cancel_reason' => ['required_if:status,'.Constants::PRODUCT_STATUS_CANCELED,'string']
+                Constants::PRODUCT_STATUS_APPROVED,
+                Constants::PRODUCT_STATUS_CANCEL_APPROVED,
+                Constants::PRODUCT_STATUS_REJECTED
+            ])
+            ],
         ];
     }
 }

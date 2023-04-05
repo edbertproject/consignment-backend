@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Entities\PaymentMethod;
+use App\Rules\Public\ProductAuctionCheckoutRule;
 use App\Utils\Constants;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,8 @@ class OrderCreateRequest extends FormRequest
         if (is_array($orders)) {
             $rules['cart_ids'] = ['required'];
             $rules['cart_ids.*'] = ['distinct', 'exists:carts,id'];
+        } else {
+            $rules['product_auction_id'] = ['required', new ProductAuctionCheckoutRule];
         }
 
         return $rules;

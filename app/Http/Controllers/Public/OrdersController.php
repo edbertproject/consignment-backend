@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Criteria\Public\OrderCriteria;
 use App\Entities\ApiExternalLog;
 use App\Entities\Cart;
 use App\Entities\Invoice;
 use App\Entities\Order;
 use App\Entities\PaymentMethod;
+use App\Entities\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
 use App\Services\InvoiceService;
@@ -46,22 +48,26 @@ class OrdersController extends Controller
     public function __construct(OrderRepository $repository)
     {
         $this->__rest($repository);
+
+        $this->indexCriterias = [
+            OrderCriteria::class
+        ];
+    }
+
+    public function check(Requests\Public\OrderCheckRequest $request) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Checkout checked.'
+        ]);
     }
 
     public function store(OrderCreateRequest $request)
     {
         $user = $request->user();
         $cartIds = collect($request->get('cart_ids', []));
+        $productAuctionId = Product::find($request->get('product_auction_id'));
         $paymentMethod = PaymentMethod::query()->find($request->get('payment_method_id'));
-
         $date = Carbon::now('Asia/Jakarta')->toDateString();
-
-        $invoiceNumber = NumberSettingService::generate(Invoice::class);
-        $orderedNumber = [];
-        $totalOrder = $cartIds->count();
-        for ($i = 0; $i < $totalOrder; $i++) {
-            $orderedNumber[] = NumberSettingService::generate(Order::class);
-        }
 
         try {
             DB::beginTransaction();
@@ -70,7 +76,7 @@ class OrdersController extends Controller
                 ->create([
                     'user_id' => $user->id,
                     'date' => $date,
-                    'number' => $invoiceNumber,
+                    'number' => NumberSettingService::generate(Invoice::class),
                     'expires_at' => now()->addMinutes(Constants::INVOICE_EXPIRES),
                     'status' => Constants::INVOICE_STATUS_PENDING,
                     'payment_method_id' => $paymentMethod->id,
@@ -85,26 +91,44 @@ class OrdersController extends Controller
                     'grand_total' => 0,
                 ]);
 
-            $index = 0;
-            foreach ($cartIds as $cartId) {
-                $cart = Cart::query()->findOrFail($cartId);
-                $invoice->subtotal += $cart->product->price * $cart->quantity;
+            if (count($cartIds) > 0) {
+                foreach ($cartIds as $cartId) {
+                    $cart = Cart::query()->findOrFail($cartId);
+                    $invoice->subtotal += $cart->product->price * $cart->quantity;
+
+                    $data = [
+                        'date' => $date,
+                        'invoice_id' => $invoice->id,
+                        'user_id' => $user->id,
+                        'user_address_id' => $request->get('user_address_id'),
+                        'product_id' => $cart->product->id,
+                        'partner_id' => $cart->product->partner_id,
+                        'quantity' => $cart->quantity,
+                        'price' => $cart->product->price,
+                    ];
+
+                    OrderService::storeOrder($data, NumberSettingService::generate(Order::class));
+
+                    $cart->delete();
+                }
+            } else {
+                $invoice->subtotal += $productAuctionId->price * $productAuctionId->available_quantity;
 
                 $data = [
                     'date' => $date,
                     'invoice_id' => $invoice->id,
                     'user_id' => $user->id,
                     'user_address_id' => $request->get('user_address_id'),
-                    'product_id' => $cart->product->id,
-                    'partner_id' => $cart->product->partner_id,
-                    'quantity' => $cart->quantity,
-                    'price' => $cart->product->price,
+                    'product_id' => $productAuctionId->id,
+                    'partner_id' => $productAuctionId->partner_id,
+                    'quantity' => $productAuctionId->available_quantity,
+                    'price' => @$productAuctionId->bids()
+                        ->where('user_id',Auth::id())
+                        ->orderByDesc('id')
+                        ->first()->amount,
                 ];
 
-                OrderService::storeOrder($data, $orderedNumber[$index]);
-                $index++;
-
-                $cart->delete();
+                OrderService::storeOrder($data, NumberSettingService::generate(Order::class));
             }
 
             $invoice->tax_amount = /*(int) (($invoice->subtotal * 11) / 100)*/ 0;

@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Public;
 
+use App\Rules\Public\ProductBidAmountRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class UserAddressCreateRequest extends FormRequest
+class ProductBidRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +15,7 @@ class UserAddressCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return Auth::check();
     }
 
     /**
@@ -24,7 +26,7 @@ class UserAddressCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'amount' => ['required', 'integer', 'not_in:0', new ProductBidAmountRule($this->id)]
         ];
     }
 }

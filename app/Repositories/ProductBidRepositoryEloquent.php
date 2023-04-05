@@ -2,19 +2,18 @@
 
 namespace App\Repositories;
 
-use App\Criteria\RestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\TestRepository;
-use App\Entities\Test;
-use App\Validators\TestValidator;
+use App\Repositories\ProductBidRepository;
+use App\Entities\ProductBid;
+use App\Validators\ProductBidValidator;
 
 /**
- * Class TestRepositoryEloquent.
+ * Class ProductBidRepositoryEloquent.
  *
  * @package namespace App\Repositories;
  */
-class TestRepositoryEloquent extends BaseRepository implements TestRepository
+class ProductBidRepositoryEloquent extends BaseRepository implements ProductBidRepository
 {
     /**
      * Specify Model class name
@@ -23,17 +22,17 @@ class TestRepositoryEloquent extends BaseRepository implements TestRepository
      */
     public function model()
     {
-        return Test::class;
+        return ProductBid::class;
     }
 
-
+    
 
     /**
      * Boot up the repository, pushing criteria
      */
     public function boot()
     {
-        $this->pushCriteria(app(RestCriteria::class));
+        $this->pushCriteria(app(RequestCriteria::class));
     }
-
+    
 }

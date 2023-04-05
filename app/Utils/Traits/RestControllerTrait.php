@@ -8,6 +8,7 @@ use App\Services\ExceptionService;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Prettus\Repository\Contracts\RepositoryInterface;
 
 trait RestControllerTrait
 {

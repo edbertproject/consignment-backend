@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Criteria\Public\MyProductAuctionCriteria;
 use App\Entities\User;
 use App\Http\Requests\AccountUpdateRequest;
 use App\Http\Resources\BaseResource;
 use App\Http\Requests\AccountUpdatePasswordRequest;
+use App\Repositories\ProductRepository;
 use App\Services\ExceptionService;
 use App\Services\MediaService;
 use Carbon\Carbon;
@@ -16,6 +18,10 @@ use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
 {
+    public function __construct(protected ProductRepository $productRepository)
+    {
+    }
+
     public function account(Request $request)
     {
         $user = $request->user();
@@ -99,5 +105,11 @@ class AccountController extends Controller
         return response()->json([
             'success' => true,
         ], 200);
+    }
+
+    public function myAuction(Request $request) {
+        $this->productRepository->pushCriteria(new MyProductAuctionCriteria($request));
+
+        return BaseResource::collection($this->productRepository->paginate($request->per_page));
     }
 }

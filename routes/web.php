@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +20,7 @@ Auth::routes(['register' => false]);
 Route::view('/home', 'home')->middleware('auth')->name('home');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/scheduler', function () {
+    Artisan::call('schedule:run');
+});

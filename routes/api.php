@@ -42,10 +42,16 @@ Route::group(['middleware' => ['auth:api']], function () {
     });
 
     Route::group(['namespace' => 'Public'], function () {
+        Route::apiResource('user-address', 'UserAddressesController')->parameters(['user-address' => 'id']);
+
         Route::apiResource('cart', 'CartsController')->parameters(['cart' => 'id'])->only(['index', 'store', 'update', 'destroy']);
         Route::apiResource('order', 'OrdersController')->parameters(['order' => 'id'])->except(['destroy']);
+        Route::post('order/check', ['uses' => 'OrdersController@check']);
 
         Route::apiResource('payment-method', 'PaymentMethodsController')->parameters(['payment-method' => 'id'])->only(['index', 'show']);
+
+        Route::apiResource('product', 'ProductsController')->parameters(['product' => 'id'])->only(['index', 'show']);
+        Route::post('product/{id}/bid', ['uses' => 'ProductsController@bid']);
 
         Route::post('shipping/calculate', ['uses' => 'ShippingsController@calculate']);
     });

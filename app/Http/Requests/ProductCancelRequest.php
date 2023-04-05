@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class TestCreateRequest extends FormRequest
+class ProductCancelRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +14,7 @@ class TestCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return Auth::check();
     }
 
     /**
@@ -24,7 +25,7 @@ class TestCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'cancel_reason' => ['required','string']
         ];
     }
 }

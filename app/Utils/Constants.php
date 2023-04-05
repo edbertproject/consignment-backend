@@ -4,28 +4,6 @@ namespace App\Utils;
 
 class Constants
 {
-    const SETTING_ID = 1;
-
-    const PAGE_HOME_ID = 1;
-
-    const PAGE_ABOUT_ID = 2;
-
-    const PAGE_BOOKING_ID = 3;
-
-    const PAGE_PSYCHOLOGIST_ID = 4;
-
-    const PAGE_SERVICE_ID = 5;
-
-    const PAGE_EVENT_ID = 6;
-
-    const PAGE_INSIGHT_ID = 7;
-
-    const PAGE_CONTACT_ID = 8;
-
-    const PAGE_TERMS_CONDITION_ID = 9;
-
-    const PAGE_PRIVACY_POLICY_ID = 10;
-
     // PRODUCT
     const PRODUCT_CONDITION_BNIB = "Brand New In Box";
     const PRODUCT_CONDITION_BNOB = "Brand New Open Box";
@@ -41,15 +19,19 @@ class Constants
     const PRODUCT_WARRANTIES = [self::PRODUCT_WARRANTY_ON,self::PRODUCT_WARRANTY_OFF];
     const PRODUCT_TYPE_CONSIGN = "Consign";
     const PRODUCT_TYPE_AUCTION = "Auction";
-    const PRODUCT_TYPES = [self::PRODUCT_TYPE_CONSIGN,self::PRODUCT_TYPE_AUCTION];
+    const PRODUCT_TYPE_SPECIAL_AUCTION = "Special Auction";
+    const PRODUCT_TYPES = [self::PRODUCT_TYPE_CONSIGN,self::PRODUCT_TYPE_AUCTION, self::PRODUCT_TYPE_SPECIAL_AUCTION];
     const PRODUCT_STATUS_WAITING_APPROVAL = 'Waiting Approval';
     const PRODUCT_STATUS_WAITING_CANCEL_APPROVAL = 'Waiting Cancel Approval';
+    const PRODUCT_STATUS_CANCEL_APPROVED = 'Cancel Approved';
     const PRODUCT_STATUS_APPROVED = 'Approved';
     const PRODUCT_STATUS_REJECTED = 'Rejected';
-    const PRODUCT_STATUS_CANCELED = 'Canceled';
     const PRODUCT_STATUS_ACTIVE = 'Active';
     const PRODUCT_STATUS_SOLD = 'Sold';
     const PRODUCT_STATUS_CLOSED = 'Closed';
+
+    // AUCTION
+    const PRODUCT_AUCTION_EXPIRES = 12;
 
     // PARTNER
     const PARTNER_STATUS_WAITING_APPROVAL = 'Waiting Approval';
@@ -83,6 +65,7 @@ class Constants
     const ORDER_USER_STATUS_CANCELED = 'Canceled';
     const ORDER_USER_STATUS_PROCESSED = 'Processed';
     const ORDER_USER_STATUS_ON_DELIVERY = 'On Delivery';
+    const ORDER_USER_STATUS_ARRIVED = 'Arrived';
     const ORDER_USER_STATUS_ON_COMPLAINED = 'Complained';
     const ORDER_USER_STATUS_COMPLETED = 'Completed';
 

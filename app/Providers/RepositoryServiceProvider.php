@@ -43,6 +43,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\PaymentMethodInstructionRepository::class, \App\Repositories\PaymentMethodInstructionRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ApiExternaLogRepository::class, \App\Repositories\ApiExternaLogRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ApiExternalLogRepository::class, \App\Repositories\ApiExternalLogRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\ProductBidRepository::class, \App\Repositories\ProductBidRepositoryEloquent::class);
         //:end-bindings:
     }
 }

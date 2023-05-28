@@ -26,8 +26,8 @@ class OrderCheckRequest extends FormRequest
     public function rules()
     {
         return [
-            'cart_ids' => ['required', new OrderCheckCartRule],
-            'cart_ids.*' => ['distinct', 'exists:carts,id'],
+//            'cart_ids' => ['required', new OrderCheckCartRule],
+//            'cart_ids.*' => ['distinct', 'exists:carts,id'],
         ];
     }
 }

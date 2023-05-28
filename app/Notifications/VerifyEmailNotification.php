@@ -41,11 +41,11 @@ class VerifyEmailNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->from(env('MAIL_FROM_ADDRESS'), 'Sense Game')
-            ->subject('Sense Game - Your Account has been Created')
+            ->from(env('MAIL_FROM_ADDRESS'), 'Consignx')
+            ->subject('Your Account has been Created')
             ->greeting('Hi '.$notifiable->name)
-            ->line('Welcome to Sense Game! Your account has been created. Please verify your account by clicking this button.')
-            ->action('Login', "{$this->url}/auth/verification?token={$this->token}&is_success=1");
+            ->line('Welcome to Consignz! Your account has been created. Please verify your account by clicking this button.')
+            ->action('Verify', config('app.front_url')."/verify-email?token={$this->token}&is_success=1");
     }
 
     /**

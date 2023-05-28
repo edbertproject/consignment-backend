@@ -47,7 +47,7 @@ trait RestControllerTrait
         return $this->indexResource::collection($this->repository->paginate($request->per_page));
     }
 
-    public function show(Request $request, int $id)
+    public function show(Request $request, $id)
     {
         foreach ($this->indexCriterias as $indexCriteria) {
             $this->repository->pushCriteria(new $indexCriteria($request));

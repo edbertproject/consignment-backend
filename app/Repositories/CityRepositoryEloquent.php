@@ -20,7 +20,8 @@ class CityRepositoryEloquent extends BaseRepository implements CityRepository
     use CacheableRepository;
 
     protected $fieldSearchable = [
-        'name'
+        'name',
+        'province_id'
     ];
 
     /**

@@ -29,7 +29,8 @@ class CartCriteria implements CriteriaInterface
     {
         return $model->select('carts.*')
             ->addSelect('products.name AS product_name')
-            ->addSelect('products.available_quantity AS available_quantity')
+            ->addSelect('products.price AS price')
+            ->addSelect('products.available_quantity AS stock')
             ->addSelect('product_categories.name AS category_name')
             ->join('products', 'products.id', '=', 'carts.product_id')
             ->join('product_categories', 'product_categories.id', '=', 'products.product_category_id')

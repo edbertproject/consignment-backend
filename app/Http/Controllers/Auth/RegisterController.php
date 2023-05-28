@@ -63,7 +63,7 @@ class RegisterController extends Controller
 
             return ($this->show($request, $data->id))->additional([
                 'success' => true,
-                'message' => 'Data created.'
+                'message' => 'Register success, please check your email address to verification email.'
             ]);
         } catch (Exception $e) {
             DB::rollBack();

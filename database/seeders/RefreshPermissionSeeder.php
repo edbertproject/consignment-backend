@@ -27,5 +27,15 @@ class RefreshPermissionSeeder extends Seeder
         foreach ($roles as $role) {
             $role->syncPermissions(Permission::pluck('name'));
         }
+
+        $partnerRole = Role::query()->whereIn('name',[
+            Constants::ROLE_PARTNER
+        ])->first();
+
+        $partnerRole->syncPermissions(
+            Permission::query()
+                ->whereIn('group', ['product','order'])
+                ->pluck('name')
+        );
     }
 }

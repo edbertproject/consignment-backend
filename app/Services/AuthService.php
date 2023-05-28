@@ -21,8 +21,17 @@ class AuthService
             ->where('email', $email)
             ->whereHas('roles', function ($query) {
                 $query->where('role_id', '!=', Constants::ROLE_PUBLIC_ID);
-            })
-            ->first();
+            })->where(function ($w) {
+                $w->where(function ($q) {
+                    $q->whereHas('roles', function ($query) {
+                        $query->where('role_id', Constants::ROLE_PARTNER_ID);
+                    })->whereHas('partner', function ($p) {
+                        $p->where('status', Constants::PARTNER_STATUS_APPROVED);
+                    });
+                })->orWhereHas('roles', function ($query) {
+                    $query->where('role_id', '!=', Constants::ROLE_PARTNER_ID);
+                });
+            })->first();
 
         if (! $user) {
             return false;

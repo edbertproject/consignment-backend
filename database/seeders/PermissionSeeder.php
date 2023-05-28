@@ -48,6 +48,11 @@ class PermissionSeeder extends Seeder
                 'group' => 'product',
                 'names' => Constants::PERMISSION_RWD
             ],
+            [
+                'label' => 'Order',
+                'group' => 'order',
+                'names' => Constants::PERMISSION_RW
+            ],
         ];
 
 

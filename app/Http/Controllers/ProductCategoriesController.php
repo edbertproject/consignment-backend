@@ -6,6 +6,7 @@ use App\Entities\User;
 use App\Http\Resources\BaseResource;
 use App\Repositories\UserRepository;
 use App\Services\ExceptionService;
+use App\Services\MediaService;
 use App\Utils\Traits\RestControllerTrait;
 use Illuminate\Http\Request;
 use Exception;
@@ -39,6 +40,8 @@ class ProductCategoriesController extends Controller
 
             $data = $this->repository->create($request->all());
 
+            MediaService::sync($data,$request,['photo']);
+
             DB::commit();
 
             return ($this->show($request, $data->id))->additional([
@@ -56,6 +59,8 @@ class ProductCategoriesController extends Controller
             DB::beginTransaction();
 
             $data = $this->repository->update($request->all(),$id);
+
+            MediaService::sync($data,$request,['photo']);
 
             DB::commit();
 

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Rules\NotPresent;
 use App\Rules\ProductDesiredPriceRule;
+use App\Services\MediaService;
 use App\Utils\Constants;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +38,9 @@ class ProductUpdateRequest extends FormRequest
         $conditionalRules = [];
 
         if ($this->type === Constants::PRODUCT_TYPE_SPECIAL_AUCTION) {
-            $conditionalRules['participant'] = ['required', 'integer', 'min:5'];
+            $conditionalRules['participant'] = ['required', 'integer', 'min:3'];
+            $conditionalRules['eligible_participants'] = ['required', 'array'];
+            $conditionalRules['eligible_participants.*'] = ['required', 'distinct', 'exists:users,id,deleted_at,NULL'];
         }
 
         if ($this->type === Constants::PRODUCT_TYPE_CONSIGN) {
@@ -47,7 +50,7 @@ class ProductUpdateRequest extends FormRequest
         if (in_array($this->type,[Constants::PRODUCT_TYPE_AUCTION, Constants::PRODUCT_TYPE_SPECIAL_AUCTION])) {
             $conditionalRules['start_price'] = ['required', 'integer', 'min:0'];
             $conditionalRules['multiplied_price'] = ['required', 'integer', 'min:0'];
-            $conditionalRules['desired_price'] = ['required', 'integer', 'min:'.$this->start_price, new ProductDesiredPriceRule($this->start_price,$this->multiplied_price)];
+            $conditionalRules['desired_price'] = ['nullable', 'integer', 'min:'.$this->start_price, new ProductDesiredPriceRule($this->start_price,$this->multiplied_price)];
         }
 
         return array_merge([
@@ -66,6 +69,8 @@ class ProductUpdateRequest extends FormRequest
             'long_dimension' => 'required|numeric|min:0|not_in:0',
             'wide_dimension' => 'required|numeric|min:0|not_in:0',
             'high_dimension' => 'required|numeric|min:0|not_in:0',
+            'photos' => ['nullable','array','min:2'],
+            'photos.*' => array_merge(['nullable'], MediaService::fileRule(['image'])),
             'condition' => ['required', Rule::in(Constants::PRODUCT_CONDITIONS)],
             'warranty' => ['required', Rule::in(Constants::PRODUCT_WARRANTIES)],
             'description' => 'nullable|string',

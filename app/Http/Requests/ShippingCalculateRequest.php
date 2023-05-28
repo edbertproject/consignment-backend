@@ -25,7 +25,6 @@ class ShippingCalculateRequest extends FormRequest
     public function rules()
     {
         return [
-            'cart_id' => ['required', 'distinct', 'exists:carts,id'],
             'user_address_id' => ['required', 'exists:user_addresses,id,deleted_at,NULL,user_id,'.Auth::user()->id]
         ];
     }

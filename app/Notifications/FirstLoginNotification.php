@@ -52,8 +52,8 @@ class FirstLoginNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'subject'=>'Lengkapi Data Anda',
-            'message'=>'Terima Kasih Telah Melakukan Pendaftaran. Segera Lengkapi Informasi Diri Anda.'
+            'subject'=>'Complete your profile',
+            'message'=>'Thank you for registration in Consignx. Complete Your Information Immediately.'
         ];
     }
 }

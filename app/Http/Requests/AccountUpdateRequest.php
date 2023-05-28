@@ -30,6 +30,8 @@ class AccountUpdateRequest extends FormRequest
             'phone_number' => 'required|string|max:15',
             'date_of_birth' => 'required|date_format:Y-m-d',
             'gender' => 'required|in:Male,Female',
+            'bank_name' => 'required|in:BCA,MANDIRI,BRI',
+            'bank_number' => 'required|numeric',
             'photo' => array_merge(['nullable'], MediaService::fileRule(['image'])),
         ];
     }

@@ -245,7 +245,6 @@ class RestCriteria implements CriteriaInterface
      */
     private function parserSorted($sortedBy) {
         $sortAliases = config('repository.criteria.sort_aliases', []);
-        Log::info($sortAliases[$sortedBy]);
         return $sortAliases[$sortedBy];
     }
 

@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Criteria\UserPartnerCriteria;
-use App\Http\Requests\UserPartnerApproveRequest;
 use App\Http\Requests\UserPartnerCreateRequest;
-use App\Http\Requests\UserPartnerRejectedRequest;
 use App\Http\Requests\UserPartnerUpdateRequest;
 use App\Http\Requests\UserPartnerUpdateStatusRequest;
 use App\Http\Resources\UserPartnerShowResource;
@@ -26,7 +24,7 @@ use Illuminate\Support\Facades\DB;
 class UserPartnerController extends Controller
 {
     use RestControllerTrait {
-            RestControllerTrait::__construct as public __rest;
+        RestControllerTrait::__construct as public __rest;
     }
 
     public function __construct(UserRepository $repository) {
@@ -40,53 +38,53 @@ class UserPartnerController extends Controller
         }
 
     public function store(UserPartnerCreateRequest $request) {
-            try {
-                DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-                $request->merge([
-                    'is_active' => true
-                ]);
+            $request->merge([
+                'is_active' => true
+            ]);
 
-                $data = $this->repository->create($request->all());
+            $data = $this->repository->create($request->all());
 
-                $data->partner()->updateOrCreate($request->all());
+            $data->partner()->updateOrCreate($request->all());
 
-                $data->syncRoles([Constants::ROLE_PARTNER_ID]);
+            $data->syncRoles([Constants::ROLE_PARTNER_ID]);
 
-                MediaService::sync($data,$request,['photo']);
+            MediaService::sync($data,$request,['photo']);
 
-                DB::commit();
+            DB::commit();
 
-                return ($this->show($request, $data->id))->additional([
-                    'success' => true,
-                    'message' => 'Data created.'
-                ]);
-            } catch (Exception $e) {
-                DB::rollBack();
-                return ExceptionService::responseJson($e);
-            }
+            return ($this->show($request, $data->id))->additional([
+                'success' => true,
+                'message' => 'Data created.'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ExceptionService::responseJson($e);
         }
+    }
 
     public function update(UserPartnerUpdateRequest $request, int $id) {
-            try {
-                DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-                $data = $this->repository->update($request->all(),$id);
+            $data = $this->repository->update($request->all(),$id);
 
-                $data->partner()->updateOrCreate($request->all());
+            $data->partner()->updateOrCreate($request->all());
 
-                MediaService::sync($data,$request,['photo']);
+            MediaService::sync($data,$request,['photo']);
 
-                DB::commit();
+            DB::commit();
 
-                return ($this->show($request, $data->id))->additional([
-                    'success' => true,
-                    'message' => 'Data updated.'
-                ]);
-            } catch (Exception $e) {
-                DB::rollBack();
-                return ExceptionService::responseJson($e);
-            }
+            return ($this->show($request, $data->id))->additional([
+                'success' => true,
+                'message' => 'Data updated.'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ExceptionService::responseJson($e);
+        }
     }
 
     public function updateStatus(UserPartnerUpdateStatusRequest $request, int $id) {
@@ -94,10 +92,18 @@ class UserPartnerController extends Controller
             DB::beginTransaction();
 
             $data = $this->repository->find($id);
-            $data->partner()->update([
-                'status' => $request->status
-            ],$id);
 
+            if ($request->status === Constants::PARTNER_STATUS_APPROVED) {
+                $data->syncRoles([Constants::ROLE_PARTNER_ID]);
+                $data->is_active = true;
+
+                // partner approved notification
+            } else {
+                // partner reject notification
+            }
+
+            $data->status = $request->status;
+            $data->save();
             DB::commit();
 
             return ($this->show($request, $data->id))->additional([

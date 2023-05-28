@@ -11,6 +11,7 @@ use App\Entities\PaymentMethod;
 use App\Entities\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
+use App\Services\ExceptionService;
 use App\Services\InvoiceService;
 use App\Services\NumberSettingService;
 use App\Services\OrderService;
@@ -54,10 +55,25 @@ class OrdersController extends Controller
         ];
     }
 
-    public function check(Requests\Public\OrderCheckRequest $request) {
+    public function check(Request $request) {
+        $cart = Cart::query()
+            ->select(
+                DB::raw('IFNULL(products.partner_id,"ADMIN") AS partner')
+            )->join('products','products.id','carts.product_id')
+            ->where('carts.user_id',Auth::id())
+            ->pluck('partner')
+            ->all();
+
+        if (count(array_unique($cart)) > 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Checkout unavailable because product has different seller.'
+            ], 422);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Checkout checked.'
+            'message' => 'Checkout available.'
         ]);
     }
 
@@ -154,6 +170,28 @@ class OrdersController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
+        }
+    }
+
+    public function updateStatusBuyer(Requests\Public\OrderUpdateStatusBuyerRequest $request, string $id) {
+        try {
+            DB::beginTransaction();
+
+            $data = $this->repository->update([
+                'status_buyer' => $request->get('status')
+            ],$id);
+
+            OrderService::handleUpdateStatusBuyer($data);
+
+            DB::commit();
+
+            return ($this->show($request, $data->id))->additional([
+                'success' => true,
+                'message' => 'Data status updated.'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ExceptionService::responseJson($e);
         }
     }
 

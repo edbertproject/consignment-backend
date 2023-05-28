@@ -52,12 +52,10 @@ class ResetPasswordRequestNotification extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        $frontEndUrl = env('APP_FRONT_URL') . '/auth/reset-password';
-
-        Log::info($this->token);
+        $frontEndUrl = config('app.front_url') . '/reset-password';
 
         return (new MailMessage)
-            ->from(env('MAIL_FROM_ADDRESS'), 'Personal Growth')
+            ->from(env('MAIL_FROM_ADDRESS'), 'Consignx')
             ->subject(Lang::get('Reset Password Notification'))
             ->line(Lang::get('You are receiving this email because we received a password reset request for your account.'))
             ->action(Lang::get('Reset Password'), "$frontEndUrl?token={$this->token}&email={$notifiable->getEmailForPasswordReset()}&type=reset")

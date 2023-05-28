@@ -4,6 +4,9 @@ namespace App\Entities;
 
 use App\Entities\Base\BaseModel;
 use App\Utils\Constants;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -30,6 +33,7 @@ class Product extends BaseModel
         'participant',
         'winner_id',
         'name',
+        'slug',
         'price',
         'start_price',
         'multiplied_price',
@@ -56,6 +60,7 @@ class Product extends BaseModel
      * @var string
      */
     public $appends = [
+        'can_wishlist',
         'seller_name',
         'seller_city',
         'current_bid',
@@ -90,6 +95,10 @@ class Product extends BaseModel
         return $this->hasMany(ProductBid::class);
     }
 
+    public function orders() {
+        return $this->hasMany(Order::class);
+    }
+
     public function productCategory() {
         return $this->belongsTo(ProductCategory::class);
     }
@@ -102,23 +111,74 @@ class Product extends BaseModel
         return $this->belongsTo(Partner::class);
     }
 
+    /**
+     * @return BelongsToMany
+     */
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'product_participants', 'product_id', 'user_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function relationParticipants()
+    {
+        return $this->hasMany(ProductParticipant::class,'product_id');
+    }
+
+    public function userWishlists() {
+        return $this->belongsToMany(User::class, 'wishlists', 'product_id','user_id');
+    }
+
+    public function getCanWishlistAttribute() {
+        return $this->userWishlists()
+            ->when(Auth::check(), function ($q) {
+                $q->where('user_id', Auth::id());
+            })->doesntExist();
+    }
+
     public function getCurrentBidAttribute() {
         return @$this->bids()->latest()->first()->amount;
     }
 
     public function getCanUpdateAttribute() {
-        if (!empty($this->partner_id)) {
-            return $this->partner_id === Auth::id();
+        if (Auth::check() && Auth::user()->hasRole(Constants::ROLE_SUPER_ADMIN_ID)) {
+            return !in_array($this->status, [
+                Constants::PRODUCT_STATUS_SOLD,
+                Constants::PRODUCT_STATUS_CLOSED,
+                Constants::PRODUCT_STATUS_CANCEL_APPROVED,
+                Constants::PRODUCT_STATUS_REJECTED,
+            ]);
         }
 
-        return true;
+        if (!empty($this->partner_id)) {
+            return $this->partner_id === @Auth::user()->partner->id && $this->orders()->doesntExist() &&
+                !in_array($this->status, [
+                    Constants::PRODUCT_STATUS_SOLD,
+                    Constants::PRODUCT_STATUS_CLOSED,
+                    Constants::PRODUCT_STATUS_CANCEL_APPROVED,
+                    Constants::PRODUCT_STATUS_REJECTED,
+                ]);
+        }
+
+        return !in_array($this->status, [
+            Constants::PRODUCT_STATUS_SOLD,
+            Constants::PRODUCT_STATUS_CLOSED,
+            Constants::PRODUCT_STATUS_CANCEL_APPROVED,
+            Constants::PRODUCT_STATUS_REJECTED,
+        ]);
     }
 
     public function getCanDeleteAttribute() {
-        return empty($this->partner_id) && !Auth::user()->hasRole(Constants::ROLE_PARTNER_ID);
+        if (!Auth::check()) return false;
+
+        return empty($this->partner_id) && !Auth::user()->hasRole(Constants::ROLE_PARTNER_ID) && $this->can_update;
     }
 
     public function getCanApproveAttribute() {
+        if (!Auth::check()) return false;
+
         return $this->status === Constants::PRODUCT_STATUS_WAITING_APPROVAL && !Auth::user()->hasRole(Constants::ROLE_PARTNER_ID);
     }
 
@@ -127,11 +187,14 @@ class Product extends BaseModel
     }
 
     public function getCanApproveCancelAttribute() {
+        if (!Auth::check()) return false;
+
         return $this->status === Constants::PRODUCT_STATUS_WAITING_CANCEL_APPROVAL && !Auth::user()->hasRole(Constants::ROLE_PARTNER_ID);
     }
 
     public function getCanCancelAttribute() {
-        return $this->status === Constants::PRODUCT_STATUS_APPROVED || $this->status === Constants::PRODUCT_STATUS_WAITING_APPROVAL;
+        return ($this->status === Constants::PRODUCT_STATUS_APPROVED || $this->status === Constants::PRODUCT_STATUS_WAITING_APPROVAL)
+            && $this->orders()->doesntExist();
     }
 
     public function getSellerNameAttribute() {

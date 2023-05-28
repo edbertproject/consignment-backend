@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Utils\Constants;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -16,7 +18,7 @@ class AuctionWinnerNotification extends Notification
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(protected $product)
     {
         //
     }
@@ -29,7 +31,7 @@ class AuctionWinnerNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -41,9 +43,11 @@ class AuctionWinnerNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->from(env('MAIL_FROM_ADDRESS'), 'Consignx')
+            ->subject('Congratulations you win auction')
+            ->greeting('Congratulations '.$notifiable->name)
+            ->line('You win auction for product '.$this->product->name)
+            ->line('Please checkout product immediately before '.Carbon::parse($this->product->end_date)->addHours(Constants::PRODUCT_AUCTION_EXPIRES)->format('Y-m-d hh:mm'));
     }
 
     /**

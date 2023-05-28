@@ -29,6 +29,12 @@ class Constants
     const PRODUCT_STATUS_ACTIVE = 'Active';
     const PRODUCT_STATUS_SOLD = 'Sold';
     const PRODUCT_STATUS_CLOSED = 'Closed';
+    const PRODUCT_STATUSES = [
+        self::PRODUCT_STATUS_WAITING_APPROVAL,self::PRODUCT_STATUS_WAITING_CANCEL_APPROVAL,
+        self::PRODUCT_STATUS_CANCEL_APPROVED,self::PRODUCT_STATUS_APPROVED,
+        self::PRODUCT_STATUS_REJECTED,self::PRODUCT_STATUS_ACTIVE,
+        self::PRODUCT_STATUS_SOLD,self::PRODUCT_STATUS_CLOSED
+    ];
 
     // AUCTION
     const PRODUCT_AUCTION_EXPIRES = 12;
@@ -54,20 +60,30 @@ class Constants
     const ORDER_STATUS_EXPIRED = 'Expired';
     const ORDER_STATUS_PAID = 'Paid';
     const ORDER_STATUS_PROCESS = 'Process';
+    const ORDER_STATUS_PROBLEM = 'Problem';
     const ORDER_STATUS_FINISH = 'Finish';
     const ORDER_STATUS_CANCELED = 'Canceled';
-    const ORDER_PARTNER_STATUS_WAITING_CONFIRM = 'Waiting Confirm';
-    const ORDER_PARTNER_STATUS_PROCESSING = 'Processing';
-    const ORDER_PARTNER_STATUS_CANCELED = 'Canceled';
-    const ORDER_PARTNER_STATUS_ON_DELIVERY = 'On Delivery';
-    const ORDER_PARTNER_STATUS_COMPLETED = 'Completed';
-    const ORDER_USER_STATUS_PAID = 'Paid';
-    const ORDER_USER_STATUS_CANCELED = 'Canceled';
-    const ORDER_USER_STATUS_PROCESSED = 'Processed';
-    const ORDER_USER_STATUS_ON_DELIVERY = 'On Delivery';
-    const ORDER_USER_STATUS_ARRIVED = 'Arrived';
-    const ORDER_USER_STATUS_ON_COMPLAINED = 'Complained';
-    const ORDER_USER_STATUS_COMPLETED = 'Completed';
+
+    const ORDER_SELLER_STATUS_WAITING_CONFIRM = 'Waiting Confirm';
+    const ORDER_SELLER_STATUS_PROCESSING = 'Processing';
+    const ORDER_SELLER_STATUS_CANCELED = 'Canceled';
+    const ORDER_SELLER_STATUS_ON_DELIVERY = 'On Delivery';
+    const ORDER_SELLER_STATUS_ARRIVED = 'Arrived';
+    const ORDER_SELLER_STATUS_COMPLAIN = 'On Complain';
+    const ORDER_SELLER_STATUS_COMPLETE = 'Complete';
+
+    const ORDER_SELLER_STATUS_WAITING_CONFIRM_EXPIRE = 2 * 24; // in hour
+    const ORDER_SELLER_STATUS_PROCESSING_EXPIRE = 2 * 24; // in hour
+
+    const ORDER_BUYER_STATUS_PAID = 'Paid';
+    const ORDER_BUYER_STATUS_CANCELED = 'Canceled';
+    const ORDER_BUYER_STATUS_PROCESSED = 'Processed';
+    const ORDER_BUYER_STATUS_ON_DELIVERY = 'On Delivery';
+    const ORDER_BUYER_STATUS_ARRIVED = 'Arrived';
+    const ORDER_BUYER_STATUS_COMPLAIN = 'Complained';
+    const ORDER_BUYER_STATUS_COMPLETE = 'Complete';
+
+    const ORDER_BUYER_STATUS_ARRIVED_EXPIRE = 24; // in hour
 
     // INVOICE
     const PAYMENT_METHOD_TYPE_VIRTUAL_ACCOUNT = 'Virtual Account';

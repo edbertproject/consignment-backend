@@ -26,9 +26,17 @@ class CartUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'product_id' => ['required', 'exists:products,id,deleted_at,NULL', new CartProductRule($this->user_id,$this->id)],
-            'quantity' => ['required', 'integer', 'not_in:0', new CartQuantityRule($this->product_id)],
+        $rules = [
+            'carts' => 'array|min:0',
+            'carts.*.product_id' => ['required', 'distinct', 'exists:products,id,deleted_at,NULL'],
+            'carts.*.quantity' => ['required', 'integer', 'not_in:0'],
         ];
+
+//        foreach ($this->request->get('carts') as $index => $cart) {
+//            $rules['carts.' . $index . '.product_id'] = ['required', 'distinct', 'exists:products,id,deleted_at,NULL'];
+//            $rules['carts.' . $index . '.quantity'] = ['required', 'integer', 'not_in:0', new CartQuantityRule($cart->product_id)];
+//        }
+
+        return $rules;
     }
 }

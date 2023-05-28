@@ -26,7 +26,7 @@ class AccountController extends Controller
     {
         $user = $request->user();
 
-        $data = User::with(['media','roles'])
+        $data = User::with(['photo','roles','addresses.province','addresses.city','addresses.district'])
             ->select('users.*')
             ->findOrFail($user->id);
 

@@ -32,7 +32,7 @@ class UserAddressUpdateRequest extends FormRequest
             'postal_code' => 'required|numeric',
             'province_id' => 'required|exists:provinces,id,deleted_at,NULL',
             'city_id' => 'required|exists:cities,id,deleted_at,NULL,province_id,'.$this->province_id,
-            'district_id' => 'required|exists:districts,id,deleted_at,NULL,city_id,'.$this->district_id,
+            'district_id' => 'required|exists:districts,id,deleted_at,NULL,city_id,'.$this->city_id,
             'note' => 'nullable',
             'is_primary' => 'required|boolean',
         ];

@@ -20,7 +20,8 @@ class DistrictRepositoryEloquent extends BaseRepository implements DistrictRepos
     use CacheableRepository;
 
     protected $fieldSearchable = [
-        'name'
+        'name',
+        'city_id'
     ];
 
     /**

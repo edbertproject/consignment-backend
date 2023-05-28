@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Criteria\ProductCriteria;
 use App\Criteria\UserInternalCriteria;
+use App\Entities\User;
 use App\Http\Resources\BaseResource;
 use App\Repositories\UserRepository;
 use App\Services\ExceptionService;
 use App\Services\MediaService;
+use App\Services\ProductService;
 use App\Utils\Constants;
 use App\Utils\Helper;
 use App\Utils\Traits\RestControllerTrait;
@@ -16,6 +18,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Requests\ProductCreateRequest;
@@ -47,17 +50,20 @@ class ProductsController extends Controller
 
             $request->merge([
                 'status' => Constants::PRODUCT_STATUS_APPROVED,
+                'slug' => Str::slug($request->name . Str::random('4')),
                 'available_quantity' => $request->quantity
             ]);
 
             if (Auth::user()->hasRole(Constants::ROLE_PARTNER_ID)) {
                 $request->merge([
                     'status' => Constants::PRODUCT_STATUS_WAITING_APPROVAL,
-                    'partner_id' => Auth::id()
+                    'partner_id' => Auth::user()->partner->id
                 ]);
             }
 
             $data = $this->repository->create($request->all());
+
+            $data->participants()->sync($request->get('eligible_participants'));
 
             MediaService::sync($data,$request,['photos']);
 
@@ -78,10 +84,13 @@ class ProductsController extends Controller
             DB::beginTransaction();
 
             $request->merge([
+                'slug' => Str::slug($request->name),
                 'available_quantity' => $request->quantity
             ]);
 
             $data = $this->repository->update($request->all(),$id);
+
+            $data->participants()->sync($request->get('eligible_participants'));
 
             MediaService::sync($data,$request,['photos']);
 
@@ -95,6 +104,14 @@ class ProductsController extends Controller
             DB::rollBack();
             return ExceptionService::responseJson($e);
         }
+    }
+
+    public function getEligibleParticipants(Request $request) {
+        $participants = ProductService::determineParticipantAuction($request->get('participant'));
+
+        return BaseResource::collection(
+            User::query()->findMany(array_column($participants,'id')),
+        );
     }
 
     public function updateStatus(Requests\ProductUpdateStatusRequest $request, int $id) {

@@ -38,7 +38,9 @@ class ProductCreateRequest extends FormRequest
         $conditionalRules = [];
 
         if ($this->type === Constants::PRODUCT_TYPE_SPECIAL_AUCTION) {
-            $conditionalRules['participant'] = ['required', 'integer', 'min:5'];
+            $conditionalRules['participant'] = ['required', 'integer', 'min:3'];
+            $conditionalRules['eligible_participants'] = ['required', 'array'];
+            $conditionalRules['eligible_participants.*'] = ['required', 'distinct', 'exists:users,id,deleted_at,NULL'];
         }
 
         if ($this->type === Constants::PRODUCT_TYPE_CONSIGN) {
@@ -48,7 +50,7 @@ class ProductCreateRequest extends FormRequest
         if (in_array($this->type,[Constants::PRODUCT_TYPE_AUCTION, Constants::PRODUCT_TYPE_SPECIAL_AUCTION])) {
             $conditionalRules['start_price'] = ['required', 'integer', 'min:0'];
             $conditionalRules['multiplied_price'] = ['required', 'integer', 'min:0'];
-            $conditionalRules['desired_price'] = ['required', 'integer', 'min:'.$this->start_price, new ProductDesiredPriceRule($this->start_price,$this->multiplied_price)];
+            $conditionalRules['desired_price'] = ['nullable', 'integer', 'min:'.$this->start_price, new ProductDesiredPriceRule($this->start_price,$this->multiplied_price)];
         }
 
         return array_merge([

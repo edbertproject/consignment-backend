@@ -30,7 +30,7 @@ class ProductNewBid implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('product.bid.'.$this->newBid['product_id']);
+        return new Channel('product.bid.'.$this->newBid['product_id']);
     }
 
     /**

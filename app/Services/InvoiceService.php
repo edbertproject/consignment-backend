@@ -58,6 +58,10 @@ class InvoiceService
 
         foreach($invoice->orders as $order) {
             $order->status = Constants::ORDER_STATUS_PAID;
+            $order->status_seller = Constants::ORDER_SELLER_STATUS_WAITING_CONFIRM;
+            $order->status_seller_updated_at = Carbon::now();
+            $order->status_buyer = Constants::ORDER_BUYER_STATUS_PAID;
+            $order->status_buyer_updated_at = Carbon::now();
             $order->save();
 
             $availableQuantity = $order->product->available_quantity - $order->quantity;

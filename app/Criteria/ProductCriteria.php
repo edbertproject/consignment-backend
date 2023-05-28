@@ -26,7 +26,7 @@ class ProductCriteria implements CriteriaInterface
     {
         if (Auth::user()->hasRole(Constants::ROLE_PARTNER_ID)) {
             return $model->where(function ($q) {
-                $q->where('partner_id',Auth::id())->orWhere('created_by',Auth::id());
+                $q->where('partner_id',@Auth::user()->partner->id)->orWhere('created_by',Auth::id());
             });
         }
 

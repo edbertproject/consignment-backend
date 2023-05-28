@@ -9,11 +9,19 @@ use App\Http\Requests\ShippingCalculateRequest;
 use App\Http\Resources\BaseResource;
 use App\Services\ShippingService;
 use App\Utils\Constants;
+use Illuminate\Support\Facades\Auth;
 
 class ShippingsController extends Controller
 {
     public function calculate(ShippingCalculateRequest $request) {
-        $cart = Cart::find($request->get('cart_id'));
+        $cart = Cart::query()->where('user_id', Auth::id())->first();
+
+        if (empty($cart)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart is empty'
+            ], 422);
+        }
 
         $product = $cart->product;
         $originId = @$product->partner->city_id ?? Constants::RAJA_ONGKIR_DEFAULT_CITY_ID;

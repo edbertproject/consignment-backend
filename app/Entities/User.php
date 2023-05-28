@@ -88,6 +88,10 @@ class User extends BaseAuthenticatableModel
         return $this->hasMany(UserAddress::class, 'user_id');
     }
 
+    public function wishlists() {
+        return $this->belongsToMany(Product::class, 'wishlists', 'user_id', 'product_id');
+    }
+
     public function userToken() {
         return $this->hasOne(UserToken::class, 'user_id');
     }

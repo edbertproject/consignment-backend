@@ -16,8 +16,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('check:invoice-expired')->everyMinute();
-        $schedule->command('check:availability-product')->everyMinute();
+        $schedule->command('check:invoice-expired')->everyMinute()->timezone('Asia/Jakarta');
+        $schedule->command('check:availability-product')->everyMinute()->timezone('Asia/Jakarta');
+        $schedule->command('check:order-status')->everyMinute()->timezone('Asia/Jakarta');
+        $schedule->command('notify:participant-auction')->dailyAt("10:00")->timezone('Asia/Jakarta');
         // $schedule->command('inspire')->hourly();
     }
 

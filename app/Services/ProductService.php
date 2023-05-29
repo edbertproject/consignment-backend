@@ -90,12 +90,12 @@ class ProductService
                 'temp_e.sales_count',
                 'temp_f.sales_accumulation',
             )->crossJoin(DB::raw('LATERAL (
-                SELECT CAST(IFNULL(COUNT(DISTINCT product_bids.product_id),0) AS DECIMAL) AS auction_count
+                SELECT CAST(IFNULL(COUNT(DISTINCT product_bids.product_id),1) AS DECIMAL) AS auction_count
                 FROM product_bids
                 WHERE product_bids.user_id = users.id
             ) AS temp_a'))
             ->crossJoin(DB::raw('LATERAL (
-                SELECT CAST(IFNULL(SUM(inner_temp_b.max_auction_amount),0) AS DECIMAL) AS bid_accumulation
+                SELECT CAST(IFNULL(SUM(inner_temp_b.max_auction_amount),1) AS DECIMAL) AS bid_accumulation
                 FROM (
                     SELECT IFNULL(MAX(product_bids.amount),1) AS max_auction_amount
                     FROM product_bids
@@ -104,26 +104,26 @@ class ProductService
                 ) AS inner_temp_b
             ) AS temp_b'))
             ->crossJoin(DB::raw('LATERAL (
-                SELECT CAST(IFNULL(COUNT(DISTINCT orders.id),0) AS DECIMAL) AS purchase_count
+                SELECT CAST(IFNULL(COUNT(DISTINCT orders.id),1) AS DECIMAL) AS purchase_count
                 FROM orders
                 WHERE orders.user_id = users.id
                 AND orders.status = "'. Constants::ORDER_STATUS_FINISH .'"
             ) AS temp_c'))
             ->crossJoin(DB::raw('LATERAL (
-                SELECT CAST(IFNULL(SUM(invoices.grand_total),0) AS DECIMAL) AS purchase_accumulation
+                SELECT CAST(IFNULL(SUM(invoices.grand_total),1) AS DECIMAL) AS purchase_accumulation
                 FROM orders
                 JOIN invoices ON invoices.id = orders.invoice_id
                 WHERE orders.user_id = users.id
                 AND orders.status = "'. Constants::ORDER_STATUS_FINISH .'"
             ) AS temp_d'))
             ->crossJoin(DB::raw('LATERAL (
-                SELECT CAST(IFNULL(COUNT(DISTINCT orders.id),0) AS DECIMAL) AS sales_count
+                SELECT CAST(IFNULL(COUNT(DISTINCT orders.id),1) AS DECIMAL) AS sales_count
                 FROM orders
                 WHERE orders.partner_id = users.id
                 AND orders.status = "'. Constants::ORDER_STATUS_FINISH .'"
             ) AS temp_e'))
             ->crossJoin(DB::raw('LATERAL (
-                SELECT CAST(IFNULL(SUM(invoices.grand_total),0) AS DECIMAL) AS sales_accumulation
+                SELECT CAST(IFNULL(SUM(invoices.grand_total),1) AS DECIMAL) AS sales_accumulation
                 FROM orders
                 JOIN invoices ON invoices.id = orders.invoice_id
                 WHERE orders.partner_id = users.id
@@ -142,15 +142,20 @@ class ProductService
 
         // Weight Criteria
         $weights = [
-            'auction_count' => 0.4,
-            'bid_accumulation' => 0.3,
-            'purchase_count' => 0.2,
-            'purchase_accumulation' => 0.2,
-            'sales_count' => 0.1,
-            'sales_accumulation' => 0.1
+            'auction_count' => 4,
+            'bid_accumulation' => 3,
+            'purchase_count' => 2,
+            'purchase_accumulation' => 2,
+            'sales_count' => 1,
+            'sales_accumulation' => 1
         ];
 
-        // Normalization
+        $normWeights = [];
+        foreach ($weights as $criteria => $weight) {
+            $normWeights[$criteria] = $weight / array_sum($weights);
+        }
+
+        // Normalization Data
         $maxValues = [];
         foreach (array_keys(get_object_vars($participants->first())) as $column) {
             if (!in_array($column,['id','name'])) {
@@ -179,13 +184,13 @@ class ProductService
 
             foreach (array_keys($data) as $column) {
                 if (!in_array($column,['id','name'])) {
-                    $temp[] = pow($data[$column], $weights[$column]);
+                    $temp[] = pow($data[$column], $normWeights[$column]);
                 }
             }
 
             $calculations[] = [
                 'id' => $data['id'],
-                'value' => array_sum($temp)
+                'value' => array_product($temp)
             ];
         }
 

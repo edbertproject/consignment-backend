@@ -55,7 +55,7 @@ class ExampleTest extends TestCase
     }
 
     public function test_algorithm() {
-        dd(ProductService::determineParticipantAuction(5));
+        dd(ProductService::determineParticipantAuction(3));
     }
 
     public function test_code() {

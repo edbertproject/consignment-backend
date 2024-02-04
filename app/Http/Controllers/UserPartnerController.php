@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Criteria\UserPartnerCriteria;
+use App\Entities\User;
 use App\Http\Requests\UserPartnerCreateRequest;
 use App\Http\Requests\UserPartnerUpdateRequest;
 use App\Http\Requests\UserPartnerUpdateStatusRequest;
 use App\Http\Resources\UserPartnerShowResource;
+use App\Notifications\PartnerApprovedNotification;
+use App\Notifications\PartnerRejectedNotification;
 use App\Repositories\PartnerRepository;
 use App\Repositories\UserRepository;
 use App\Services\ExceptionService;
@@ -92,17 +95,20 @@ class UserPartnerController extends Controller
             DB::beginTransaction();
 
             $data = $this->repository->find($id);
+            $user = User::find($data->id);
 
             if ($request->status === Constants::PARTNER_STATUS_APPROVED) {
                 $data->syncRoles([Constants::ROLE_PARTNER_ID]);
-                $data->is_active = true;
 
-                // partner approved notification
+                $user->notify(new PartnerApprovedNotification());
             } else {
-                // partner reject notification
+                $user->notify(new PartnerRejectedNotification());
             }
 
-            $data->status = $request->status;
+            $data->partner()->update([
+                'status' => $request->status
+            ]);
+
             $data->save();
             DB::commit();
 

@@ -63,7 +63,7 @@ class ProductCreateRequest extends FormRequest
             'multiplied_price' => ['sometimes', new NotPresent],
             'desired_price' => ['sometimes', new NotPresent],
             'start_date' => 'required|date_format:Y-m-d H:i',
-            'end_date' => 'nullable|date_format:Y-m-d H:i',
+            'end_date' => 'required|date_format:Y-m-d H:i',
             'weight' => 'required|numeric|min:0|not_in:0',
             'quantity' => 'required|integer|min:0|not_in:0',
             'long_dimension' => 'required|numeric|min:0|not_in:0',

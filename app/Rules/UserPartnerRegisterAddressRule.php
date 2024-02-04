@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Rules\Public;
+namespace App\Rules;
 
-use App\Entities\Product;
 use App\Utils\Constants;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
-class ProductAuctionCheckoutRule implements Rule
+class UserPartnerRegisterAddressRule implements Rule
 {
-    protected $message;
     /**
      * Create a new rule instance.
      *
@@ -29,12 +27,13 @@ class ProductAuctionCheckoutRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        return Product::query()
-            ->where('id',$value)
-            ->where('type','!=',Constants::PRODUCT_TYPE_CONSIGN)
-            ->where('winner_id',Auth::id())
-            ->whereRaw('end_date <= DATE_ADD(end_date, INTERVAL ? HOUR)',[Constants::PRODUCT_AUCTION_CHECKOUT_EXPIRES])
-            ->exists();
+        $user = Auth::user();
+
+        if (!empty($user->partner)) {
+            return $user->partner->status === Constants::PARTNER_STATUS_REJECTED;
+        }
+
+        return true;
     }
 
     /**
@@ -44,6 +43,6 @@ class ProductAuctionCheckoutRule implements Rule
      */
     public function message()
     {
-        return 'Product auction is invalid to checkout.';
+        return 'Your Registration still waiting approval.';
     }
 }

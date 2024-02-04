@@ -28,9 +28,14 @@ class WishlistsController extends Controller
     }
 
     public function inWishlist(Request $request, $id) {
-        return count($this->repository->where('user_id', Auth::id())
+        $exists = $this->repository->where('user_id', Auth::id())
             ->where('product_id', $id)
-            ->get()) > 0;
+            ->exists();
+
+        return response()->json([
+            "success" => true,
+            "data" => $exists
+        ]);
     }
 
     public function store(WishlistCreateRequest $request)

@@ -2,14 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Utils\Constants;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AuctionWinnerNotification extends Notification
+class PartnerApprovedNotification extends Notification
 {
     use Queueable;
 
@@ -18,7 +16,7 @@ class AuctionWinnerNotification extends Notification
      *
      * @return void
      */
-    public function __construct(protected $product)
+    public function __construct()
     {
         //
     }
@@ -31,7 +29,7 @@ class AuctionWinnerNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -42,12 +40,7 @@ class AuctionWinnerNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-            ->from(env('MAIL_FROM_ADDRESS'), 'Consignx')
-            ->subject('Congratulations you win auction')
-            ->greeting('Congratulations '.$notifiable->name)
-            ->line('You win auction for product '.$this->product->name)
-            ->line('Please checkout product immediately before '.Carbon::parse($this->product->end_date)->addHours(Constants::PRODUCT_AUCTION_CHECKOUT_EXPIRES)->format('Y-m-d H:i'));
+
     }
 
     /**
@@ -59,8 +52,8 @@ class AuctionWinnerNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'subject' => 'Congratulations you win auction',
-            'message' => 'You win auction for product '. $this->product->name .', please checkout product immediately before '.Carbon::parse($this->product->end_date)->addHours(Constants::PRODUCT_AUCTION_CHECKOUT_EXPIRES)->format('Y-m-d H:i')
+            'subject'=>'Seller Approved',
+            'message'=>'Thank you for seller registration in consignx. Now you can start selling your item.'
         ];
     }
 }

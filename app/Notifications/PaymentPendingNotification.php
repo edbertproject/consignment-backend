@@ -3,13 +3,13 @@
 namespace App\Notifications;
 
 use App\Services\NotificationService;
+use App\Utils\Constants;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 
-class PaymentPaidNotification extends Notification
+class PaymentPendingNotification extends Notification
 {
     use Queueable;
 
@@ -33,7 +33,7 @@ class PaymentPaidNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['database','mail'];
+        return ['mail','database'];
     }
 
     /**
@@ -44,19 +44,17 @@ class PaymentPaidNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        $header = NotificationService::getPaidPaymentHeader($this->invoice);
-        $table = NotificationService::getPaidPaymentTable($this->invoice->orders);
-        $note = NotificationService::getOrderNote();
+        $header = NotificationService::getPendingPaymentHeader($this->invoice);
+        $table = NotificationService::getPendingPaymentTable($this->invoice);
         $footer = NotificationService::getGeneralFooter();
 
         return (new MailMessage)
             ->from(env('MAIL_FROM_ADDRESS'), 'Consignx')
-            ->subject('Paid Payment Notification #'.$this->invoice->number)
+            ->subject('Pending Payment Notification #'.$this->invoice->number)
             ->greeting('Hi '.$notifiable->name)
             ->line(new HtmlString($header))
-            ->line('Below are the details of your order:')
+            ->line('Below are your payment details')
             ->line(new HtmlString($table))
-            ->line(new HtmlString($note))
             ->line(new HtmlString($footer));
     }
 
@@ -69,8 +67,8 @@ class PaymentPaidNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'subject' => 'Paid Payment Notification #'.$this->invoice->number,
-            'message' => 'Thank you for your payment! Please check your account page to see your order details.'
+            'subject' => 'Pending Payment Notification #'.$this->invoice->number,
+            'message' => 'Thank you for your order! Please complete your payment within '. Constants::INVOICE_EXPIRES .' minutes, or your order will be automatically canceled. Check your email for the payment details.'
         ];
     }
 }

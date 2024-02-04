@@ -23,10 +23,6 @@ class UserPartnerCriteria implements CriteriaInterface
      */
     public function apply($model, RepositoryInterface $repository)
     {
-        return $model->whereHas('roles', function ($query) {
-                $query->whereIn('role_id', [
-                    Constants::ROLE_PARTNER_ID
-                ]);
-            });
+        return $model->has('partner');
     }
 }

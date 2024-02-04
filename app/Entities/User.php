@@ -62,7 +62,9 @@ class User extends BaseAuthenticatableModel
         'total_cart',
         'can_update',
         'can_delete',
-        'can_update_status'
+        'can_update_status',
+        'status_partner',
+        'can_register_partner',
     ];
 
     /**
@@ -134,13 +136,9 @@ class User extends BaseAuthenticatableModel
     }
 
     public function getCanUpdateStatusAttribute() {
-        if ($this->roles()
-            ->where('role_id',Constants::ROLE_PARTNER_ID)
-            ->exists()) {
-            return @$this->partner->status === Constants::PARTNER_STATUS_WAITING_APPROVAL;
-        }
+        if (empty($this->partner)) return false;
 
-        return false;
+        return @$this->partner->status === Constants::PARTNER_STATUS_WAITING_APPROVAL;
     }
 
     public function getStatusAttribute() {
@@ -155,5 +153,25 @@ class User extends BaseAuthenticatableModel
         }
 
         return 'Active';
+    }
+
+    public function getStatusPartnerAttribute() {
+        $partner = $this->partner()->first();
+
+        if (empty($partner)) {
+            return Constants::PARTNER_STATUS_UNREGISTERED;
+        }
+
+        return $partner->status;
+    }
+
+    public function getCanRegisterPartnerAttribute() {
+        $partner = $this->partner()->first();
+
+        if (empty($partner)) {
+            return true;
+        }
+
+        return $partner->status === Constants::PARTNER_STATUS_REJECTED;
     }
 }

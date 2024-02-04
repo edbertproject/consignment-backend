@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Entities\Cart;
+use App\Entities\Product;
 use App\Entities\UserAddress;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ShippingCalculateRequest;
@@ -14,16 +15,21 @@ use Illuminate\Support\Facades\Auth;
 class ShippingsController extends Controller
 {
     public function calculate(ShippingCalculateRequest $request) {
-        $cart = Cart::query()->where('user_id', Auth::id())->first();
+        if (empty($request->get('product_auction_id'))) {
+            $cart = Cart::query()->where('user_id', Auth::id())->first();
 
-        if (empty($cart)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cart is empty'
-            ], 422);
+            if (empty($cart)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cart is empty'
+                ], 422);
+            }
+
+            $product = $cart->product;
+        } else {
+            $product = Product::query()->find($request->get('product_auction_id'));
         }
 
-        $product = $cart->product;
         $originId = @$product->partner->city_id ?? Constants::RAJA_ONGKIR_DEFAULT_CITY_ID;
 
         $userAddress = UserAddress::find($request->get('user_address_id'));

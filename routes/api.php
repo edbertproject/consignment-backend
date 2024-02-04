@@ -30,6 +30,7 @@ Route::group(['namespace' => 'Auth'], function () {
 Route::group(['middleware' => ['auth:api']], function () {
     Route::group(['prefix' => 'account'], function () {
         Route::get('/', 'AccountController@account')->name('account.index');
+        Route::get('/my-auction', 'AccountController@myAuction')->name('account.myAuction');
         Route::post('/', 'AccountController@update')->name('account.update');
         Route::post('/update-password', 'AccountController@updatePassword')->name('account.update-password');
         Route::post('/logout', 'AccountController@revoke')->name('account.logout');
@@ -48,14 +49,18 @@ Route::group(['middleware' => ['auth:api']], function () {
             Route::get('/districts', ['uses' => 'DistrictsController@select']);
         });
 
+        Route::post('partner', ['uses' => 'UserPartnerController@store']);
+
         Route::apiResource('user-address', 'UserAddressesController')->parameters(['user-address' => 'id']);
 
         Route::apiResource('wishlist', 'WishlistsController')->parameters(['wishlist' => 'id'])->only(['index', 'store', 'destroy']);
         Route::get('wishlist/in_wishlist/{id}', ['uses' => 'WishlistsController@inWishlist']);
-        Route::apiResource('cart', 'CartsController')->parameters(['cart' => 'id'])->only(['index', 'destroy']);
+        Route::apiResource('cart', 'CartsController')->parameters(['cart' => 'id'])->only(['index', 'store', 'destroy']);
         Route::put('cart/bulk', ['uses' => 'CartsController@update']);
         Route::apiResource('order', 'OrdersController')->parameters(['order' => 'id'])->except(['destroy']);
+        Route::put('order/status-buyer/{id}', ['uses' => 'OrdersController@updateStatusBuyer']);
         Route::post('order/check', ['uses' => 'OrdersController@check']);
+        Route::post('order/check-auction', ['uses' => 'OrdersController@checkAuction']);
 
         Route::apiResource('payment-method', 'PaymentMethodsController')->parameters(['payment-method' => 'id'])->only(['index', 'show']);
 
@@ -72,6 +77,14 @@ Route::group(['middleware' => ['auth:api']], function () {
             Route::get('/districts', ['uses' => 'DistrictsController@select']);
             Route::get('/roles', ['uses' => 'RolesController@select', 'middleware' => ['permission:read role']]);
             Route::get('/permissions', ['uses' => 'PermissionsController@select', 'middleware' => ['permission:read role']]);
+        });
+
+        Route::group(['prefix' => 'dashboard'], function () {
+            Route::get('/sales-accumulation', ['uses' => 'DashboardsController@getSalesAccumulation']);
+            Route::get('/bid-accumulation', ['uses' => 'DashboardsController@getBidAccumulation']);
+            Route::get('/product-posting', ['uses' => 'DashboardsController@getProductPosting']);
+            Route::get('/user-register', ['uses' => 'DashboardsController@getUserRegister'])->middleware('ensure_not_role:Partner');
+            Route::get('/pending-order', ['uses' => 'DashboardsController@getPendingOrder']);
         });
 
         Route::group(['middleware' => ['ensure_not_role:Partner']], function (){

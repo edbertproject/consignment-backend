@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Criteria\OrderCriteria;
+use App\Entities\OrderStatus;
 use App\Services\ExceptionService;
 use App\Services\OrderService;
 use App\Utils\Constants;
@@ -40,14 +41,12 @@ class OrdersController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $this->repository->update([
-                'status' => $request->get('status'),
-                'status_seller' => Constants::ORDER_SELLER_STATUS_COMPLETE,
-                'status_buyer' => Constants::ORDER_BUYER_STATUS_COMPLETE,
-            ],$id);
+            OrderService::updateStatus($id,$request->get('status'));
+            OrderService::updateStatus($id,Constants::ORDER_SELLER_STATUS_COMPLETE, Constants::ORDER_STATUS_TYPE_SELLER);
+            OrderService::updateStatus($id,Constants::ORDER_BUYER_STATUS_COMPLETE, Constants::ORDER_STATUS_TYPE_BUYER);
 
             DB::commit();
-            return ($this->show($request, $data->id))->additional([
+            return ($this->show($request, $id))->additional([
                 'success' => true,
                 'message' => 'Data status updated.'
             ]);
@@ -61,15 +60,13 @@ class OrdersController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $this->repository->update([
-                'status_seller' => $request->get('status')
-            ],$id);
+            $orderStatus = OrderService::updateStatus($id,$request->get('status'),Constants::ORDER_STATUS_TYPE_SELLER);
 
-            OrderService::handleUpdateStatusSeller($data);
+            OrderService::handleUpdateStatusSeller($orderStatus->status, $id);
 
             DB::commit();
 
-            return ($this->show($request, $data->id))->additional([
+            return ($this->show($request, $id))->additional([
                 'success' => true,
                 'message' => 'Data status updated.'
             ]);

@@ -30,13 +30,14 @@ class MyProductAuctionCriteria implements CriteriaInterface
     public function apply($model, RepositoryInterface $repository)
     {
         $selects = [
-            DB::raw("(IF(winner_id=".Auth::id()." and status='".Constants::PRODUCT_STATUS_CLOSED."',true,false)) AS can_pay"),
-            DB::raw("(IF(winner_id=".Auth::id().",DATE_ADD(products.end_date, INTERVAL ".Constants::PRODUCT_AUCTION_EXPIRES." HOUR),NULL)) AS expire_pay_date"),
+            'id', 'name', 'type', 'slug',
+            DB::raw("(IF(winner_id=".Auth::id()." and status='".Constants::PRODUCT_STATUS_CLOSED."' and DATE_ADD(products.end_date, INTERVAL ".Constants::PRODUCT_AUCTION_CHECKOUT_EXPIRES." HOUR) >= NOW(),TRUE,FALSE)) AS can_pay"),
+            DB::raw("(IF(winner_id=".Auth::id().",DATE_ADD(products.end_date, INTERVAL ".Constants::PRODUCT_AUCTION_CHECKOUT_EXPIRES." HOUR),NULL)) AS expire_pay_date"),
             DB::raw("(
                 IF(winner_id=".Auth::id().",
-                    IF(products.end_date > DATE_ADD(products.end_date, INTERVAL ".Constants::PRODUCT_AUCTION_EXPIRES." HOUR),'EXPIRED','WINNER')
+                    IF(NOW() > DATE_ADD(products.end_date, INTERVAL ".Constants::PRODUCT_AUCTION_CHECKOUT_EXPIRES." HOUR),'EXPIRED','WINNER')
                 ,'LOSE')
-            ) AS status")
+            ) AS status"),
         ];
 
         foreach ($selects as $select) {

@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Entities\Invoice;
 use App\Entities\Order;
 use App\Entities\User;
+use App\Notifications\AdminSellerNewOrderNotification;
+use App\Notifications\PartnerSellerNewOrderNotification;
 use App\Notifications\PaymentExpiredNotification;
 use App\Notifications\PaymentPaidNotification;
 use App\Utils\Constants;
@@ -37,14 +39,13 @@ class InvoiceService
         foreach ($invoice->orders as $order) {
             $order = Order::query()->findOrFail($order->schedule_id);
 
-            $order->status = Constants::ORDER_STATUS_EXPIRED;
-            $order->save();
+            OrderService::updateStatus($order->id, Constants::ORDER_STATUS_EXPIRED);
 
             $orderNumber[] = $order->number;
         }
 
-//        $user = User::find($invoice->user_id);
-//        $user->notify(new PaymentExpiredNotification($invoice,$orderNumber));
+        $user = User::find($invoice->user_id);
+        $user->notify(new PaymentExpiredNotification($invoice,$orderNumber));
     }
 
     public static function setPaid($invoiceId)
@@ -57,27 +58,39 @@ class InvoiceService
         }
 
         foreach($invoice->orders as $order) {
-            $order->status = Constants::ORDER_STATUS_PAID;
-            $order->status_seller = Constants::ORDER_SELLER_STATUS_WAITING_CONFIRM;
-            $order->status_seller_updated_at = Carbon::now();
-            $order->status_buyer = Constants::ORDER_BUYER_STATUS_PAID;
-            $order->status_buyer_updated_at = Carbon::now();
-            $order->save();
+            OrderService::updateStatus($order->id, Constants::ORDER_STATUS_PAID);
+            OrderService::updateStatus($order->id, Constants::ORDER_SELLER_STATUS_WAITING_CONFIRM,Constants::ORDER_STATUS_TYPE_SELLER);
+            OrderService::updateStatus($order->id, Constants::ORDER_BUYER_STATUS_PENDING,Constants::ORDER_STATUS_TYPE_BUYER);
 
             $availableQuantity = $order->product->available_quantity - $order->quantity;
 
             ProductService::updateAvailableQuantity($order->product, $availableQuantity);
             OrderService::updateAvailableCart($order->product_id, $availableQuantity);
+
+            $lastSellerStatus = @$order->sellerStatuses()->first()->updated_at;
+
+            $expireStatusAt = Carbon::parse($lastSellerStatus ?? now())
+                ->addHours(Constants::ORDER_SELLER_STATUS_WAITING_CONFIRM_EXPIRE);
+
+            if (!empty($order->product->partner_id)) {
+                $order->product->partner->user->notify(new PartnerSellerNewOrderNotification($order, $expireStatusAt));
+            } else {
+                $users = User::query()
+                    ->whereHas('roles', function ($query) {
+                        $query->whereNotIn('role_id', [
+                            Constants::ROLE_PUBLIC_ID,
+                            Constants::ROLE_PARTNER_ID,
+                        ]);
+                    })->get();
+
+                foreach ($users as $user) {
+                    $user->notify(new AdminSellerNewOrderNotification($order, $expireStatusAt));
+                }
+            }
         }
 
-//        foreach ($bookingNotifications as $bookingNotification) {
-//            $bookingNotification->schedule->psychologist->user->notify(new PsychologistNewCustomerNotification($bookingNotification));
-//
-//            UserService::sendNewBookingAdminNotification($bookingNotification);
-//        }
-
-//        $user = User::find($invoice->user_id);
-//        $user->notify(new PaymentPaidNotification($invoice));
+        $user = User::find($invoice->user_id);
+        $user->notify(new PaymentPaidNotification($invoice));
 
         return true;
     }

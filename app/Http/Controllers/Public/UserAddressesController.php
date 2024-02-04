@@ -32,7 +32,8 @@ class UserAddressesController extends Controller
             DB::beginTransaction();
 
             $request->merge([
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
+                'is_primary' => !Auth::user()->addresses()->exists()
             ]);
 
             $data = $this->repository->create($request->all());

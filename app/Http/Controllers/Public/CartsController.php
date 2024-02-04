@@ -36,7 +36,9 @@ class CartsController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $this->repository->create($request->all());
+            $data = $this->repository->create($request->merge([
+                'user_id' => Auth::id()
+            ]));
 
             DB::commit();
 
@@ -59,8 +61,10 @@ class CartsController extends Controller
                 'user_id' => Auth::id()
             ]);
 
+
+            $carts = [];
             foreach ($request->get('carts') as $cart) {
-                $this->repository->create(array_merge([
+                $carts[] = $this->repository->create(array_merge([
                     'user_id' => Auth::id(),
                 ],$cart));
             }
@@ -69,7 +73,8 @@ class CartsController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data updated.'
+                'message' => 'Data updated.',
+                'data' => $carts
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -37,9 +37,10 @@ class Constants
     ];
 
     // AUCTION
-    const PRODUCT_AUCTION_EXPIRES = 12;
+    const PRODUCT_AUCTION_CHECKOUT_EXPIRES = 12;
 
     // PARTNER
+    const PARTNER_STATUS_UNREGISTERED = 'Unregistered';
     const PARTNER_STATUS_WAITING_APPROVAL = 'Waiting Approval';
     const PARTNER_STATUS_APPROVED = 'Approved';
     const PARTNER_STATUS_REJECTED = 'Rejected';
@@ -56,6 +57,10 @@ class Constants
     const ROLE_PUBLIC = "Public";
 
     // ORDER
+    const ORDER_STATUS_TYPE_PRIMARY = 'Primary';
+    const ORDER_STATUS_TYPE_SELLER = 'Seller';
+    const ORDER_STATUS_TYPE_BUYER = 'Buyer';
+
     const ORDER_STATUS_WAITING_PAYMENT = 'Waiting Payment';
     const ORDER_STATUS_EXPIRED = 'Expired';
     const ORDER_STATUS_PAID = 'Paid';
@@ -75,7 +80,7 @@ class Constants
     const ORDER_SELLER_STATUS_WAITING_CONFIRM_EXPIRE = 2 * 24; // in hour
     const ORDER_SELLER_STATUS_PROCESSING_EXPIRE = 2 * 24; // in hour
 
-    const ORDER_BUYER_STATUS_PAID = 'Paid';
+    const ORDER_BUYER_STATUS_PENDING = 'Pending';
     const ORDER_BUYER_STATUS_CANCELED = 'Canceled';
     const ORDER_BUYER_STATUS_PROCESSED = 'Processed';
     const ORDER_BUYER_STATUS_ON_DELIVERY = 'On Delivery';
@@ -91,8 +96,8 @@ class Constants
     const INVOICE_STATUS_PENDING = 'Pending';
     const INVOICE_STATUS_PAID = 'Paid';
     const INVOICE_STATUS_CANCELED = 'Canceled';
-    const INVOICE_EXPIRES = 60;
-    const INVOICE_FEE_PLATFORM_AMOUNT_PERCENTAGE = 10;
+    const INVOICE_EXPIRES = 1;
+    const INVOICE_FEE_PLATFORM_AMOUNT_PERCENTAGE = 5;
 
     // XENDIT
     const XENDIT_INVOICE_STATUS_PAID = 'PAID';

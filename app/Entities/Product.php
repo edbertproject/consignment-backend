@@ -64,6 +64,7 @@ class Product extends BaseModel
         'seller_name',
         'seller_city',
         'current_bid',
+        'current_bid_at',
         'can_delete',
         'can_update',
         'can_approve',
@@ -138,36 +139,37 @@ class Product extends BaseModel
             })->doesntExist();
     }
 
+    private function currentBid() {
+       return @$this->bids()->latest()->first();
+    }
+
     public function getCurrentBidAttribute() {
-        return @$this->bids()->latest()->first()->amount;
+        return @$this->currentBid()->amount ?? $this->start_price;
+    }
+
+    public function getCurrentBidAtAttribute() {
+        return @$this->currentBid()->date_time;
     }
 
     public function getCanUpdateAttribute() {
-        if (Auth::check() && Auth::user()->hasRole(Constants::ROLE_SUPER_ADMIN_ID)) {
-            return !in_array($this->status, [
-                Constants::PRODUCT_STATUS_SOLD,
-                Constants::PRODUCT_STATUS_CLOSED,
-                Constants::PRODUCT_STATUS_CANCEL_APPROVED,
-                Constants::PRODUCT_STATUS_REJECTED,
-            ]);
-        }
-
-        if (!empty($this->partner_id)) {
-            return $this->partner_id === @Auth::user()->partner->id && $this->orders()->doesntExist() &&
-                !in_array($this->status, [
-                    Constants::PRODUCT_STATUS_SOLD,
-                    Constants::PRODUCT_STATUS_CLOSED,
-                    Constants::PRODUCT_STATUS_CANCEL_APPROVED,
-                    Constants::PRODUCT_STATUS_REJECTED,
-                ]);
-        }
-
-        return !in_array($this->status, [
+        $restrictedStatus = [
             Constants::PRODUCT_STATUS_SOLD,
             Constants::PRODUCT_STATUS_CLOSED,
             Constants::PRODUCT_STATUS_CANCEL_APPROVED,
             Constants::PRODUCT_STATUS_REJECTED,
-        ]);
+            Constants::PRODUCT_STATUS_ACTIVE
+        ];
+
+        if (Auth::check() && Auth::user()->hasRole(Constants::ROLE_SUPER_ADMIN_ID)) {
+            return !in_array($this->status, $restrictedStatus);
+        }
+
+        if (!empty($this->partner_id)) {
+            return $this->partner_id === @Auth::user()->partner->id && $this->orders()->doesntExist() &&
+                !in_array($this->status, $restrictedStatus);
+        }
+
+        return !in_array($this->status, $restrictedStatus);
     }
 
     public function getCanDeleteAttribute() {

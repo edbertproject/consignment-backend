@@ -34,7 +34,7 @@ class UserAddressUpdateRequest extends FormRequest
             'city_id' => 'required|exists:cities,id,deleted_at,NULL,province_id,'.$this->province_id,
             'district_id' => 'required|exists:districts,id,deleted_at,NULL,city_id,'.$this->city_id,
             'note' => 'nullable',
-            'is_primary' => 'required|boolean',
+            'is_primary' => 'nullable|boolean',
         ];
     }
 }

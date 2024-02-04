@@ -17,7 +17,22 @@ use Illuminate\Support\Facades\Redis;
 class ProductService
 {
     public static function checkActive() {
+        $specialAuctions = Product::query()
+            ->where('type', Constants::PRODUCT_TYPE_SPECIAL_AUCTION)
+            ->where('status', Constants::PRODUCT_STATUS_APPROVED)
+            ->whereNotNull('start_date')
+            ->where('start_date','<=',Carbon::now()->tz('Asia/Jakarta'))->get();
+
+        foreach ($specialAuctions as $specialAuction) {
+            $specialAuction->update(['status' => Constants::PRODUCT_STATUS_ACTIVE]);
+
+            foreach ($specialAuction->participants as $participant) {
+                $participant->notify(new SpecialAuctionParticipantNotification($specialAuction));
+            }
+        }
+
         return Product::query()
+            ->where('type','!=', Constants::PRODUCT_TYPE_SPECIAL_AUCTION)
             ->where('status', Constants::PRODUCT_STATUS_APPROVED)
             ->whereNotNull('start_date')
             ->where('start_date','<=',Carbon::now()->tz('Asia/Jakarta'))
@@ -32,14 +47,17 @@ class ProductService
             ->get();
 
         foreach ($products as $product) {
-            if ($product->type === Constants::PRODUCT_TYPE_SPECIAL_AUCTION) {
+            if ($product->type !== Constants::PRODUCT_TYPE_CONSIGN) {
                 $redisIdentifier= 'product_bid:'.$product->id;
                 $bids = collect(json_decode(Redis::get($redisIdentifier)));
 
                 $lastBid = $bids->last();
-                $product->winner_id = $lastBid->user_id;
 
-                $product->winner->notify(new AuctionWinnerNotification($product));
+                if ($lastBid) {
+                    $product->winner_id = $lastBid->user_id;
+
+                    $product->winner->notify(new AuctionWinnerNotification($product));
+                }
             }
 
             $product->status = Constants::PRODUCT_STATUS_CLOSED;
@@ -106,28 +124,60 @@ class ProductService
             ->crossJoin(DB::raw('LATERAL (
                 SELECT CAST(IFNULL(COUNT(DISTINCT orders.id),1) AS DECIMAL) AS purchase_count
                 FROM orders
+                CROSS JOIN LATERAL (
+                    SELECT order_statuses.status, order_statuses.order_id
+                    FROM order_statuses
+                    WHERE order_statuses.order_id = orders.id
+                    AND order_statuses.type = "Primary"
+                    ORDER BY order_statuses.created_at DESC
+                    LIMIT 1
+                ) AS last_statuses ON last_statuses.order_id = orders.id
                 WHERE orders.user_id = users.id
-                AND orders.status = "'. Constants::ORDER_STATUS_FINISH .'"
+                AND last_statuses.status = "'. Constants::ORDER_STATUS_FINISH .'"
             ) AS temp_c'))
             ->crossJoin(DB::raw('LATERAL (
                 SELECT CAST(IFNULL(SUM(invoices.grand_total),1) AS DECIMAL) AS purchase_accumulation
                 FROM orders
                 JOIN invoices ON invoices.id = orders.invoice_id
+                CROSS JOIN LATERAL (
+                    SELECT order_statuses.status, order_statuses.order_id
+                    FROM order_statuses
+                    WHERE order_statuses.order_id = orders.id
+                    AND order_statuses.type = "Primary"
+                    ORDER BY order_statuses.created_at DESC
+                    LIMIT 1
+                ) AS last_statuses ON last_statuses.order_id = orders.id
                 WHERE orders.user_id = users.id
-                AND orders.status = "'. Constants::ORDER_STATUS_FINISH .'"
+                AND last_statuses.status = "'. Constants::ORDER_STATUS_FINISH .'"
             ) AS temp_d'))
             ->crossJoin(DB::raw('LATERAL (
                 SELECT CAST(IFNULL(COUNT(DISTINCT orders.id),1) AS DECIMAL) AS sales_count
                 FROM orders
+                CROSS JOIN LATERAL (
+                    SELECT order_statuses.status, order_statuses.order_id
+                    FROM order_statuses
+                    WHERE order_statuses.order_id = orders.id
+                    AND order_statuses.type = "Primary"
+                    ORDER BY order_statuses.created_at DESC
+                    LIMIT 1
+                ) AS last_statuses ON last_statuses.order_id = orders.id
                 WHERE orders.partner_id = users.id
-                AND orders.status = "'. Constants::ORDER_STATUS_FINISH .'"
+                AND last_statuses.status = "'. Constants::ORDER_STATUS_FINISH .'"
             ) AS temp_e'))
             ->crossJoin(DB::raw('LATERAL (
                 SELECT CAST(IFNULL(SUM(invoices.grand_total),1) AS DECIMAL) AS sales_accumulation
                 FROM orders
                 JOIN invoices ON invoices.id = orders.invoice_id
+                LEFT JOIN LATERAL (
+                    SELECT order_statuses.status, order_statuses.order_id
+                    FROM order_statuses
+                    WHERE order_statuses.order_id = orders.id
+                    AND order_statuses.type = "Primary"
+                    ORDER BY order_statuses.created_at DESC
+                    LIMIT 1
+                ) AS last_statuses ON last_statuses.order_id = orders.id
                 WHERE orders.partner_id = users.id
-                AND orders.status = "'. Constants::ORDER_STATUS_FINISH .'"
+                AND last_statuses.status = "'. Constants::ORDER_STATUS_FINISH .'"
             ) AS temp_f'))
             ->whereRaw('users.id IN(
                 SELECT DISTINCT model_has_roles.model_id
@@ -190,7 +240,7 @@ class ProductService
 
             $calculations[] = [
                 'id' => $data['id'],
-                'value' => array_product($temp)
+                'value' => array_sum($temp)
             ];
         }
 
@@ -210,6 +260,6 @@ class ProductService
             return strcmp($a["value"], $b["value"]) * -1;
         });
 
-        return array_slice($results,0,$participantNumber);
+        return array_slice($results,0,$participantNumber,true);
     }
 }

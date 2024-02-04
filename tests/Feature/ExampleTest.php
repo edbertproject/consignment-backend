@@ -5,17 +5,24 @@ namespace Tests\Feature;
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Entities\Invoice;
 use App\Entities\Order;
+use App\Entities\OrderStatus;
+use App\Entities\Product;
 use App\Entities\User;
+use App\Events\ProductNewBid;
 use App\Http\Controllers\Public\OrdersController;
 use App\Jobs\ProductBidStoreJob;
+use App\Notifications\AdminSellerNewOrderNotification;
+use App\Notifications\PartnerSellerNewOrderNotification;
 use App\Notifications\TestEmailNotification;
 use App\Services\NumberSettingService;
+use App\Services\OrderService;
 use App\Services\ProductService;
 use App\Services\ShippingService;
 use App\Services\XenditService;
 use App\Utils\Constants;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 use Xendit\VirtualAccounts;
@@ -30,7 +37,7 @@ class ExampleTest extends TestCase
      */
     public function test_the_application_returns_a_successful_response()
     {
-        print_r(urlencode('INV/202303/00001'));
+        print_r(Artisan::call('schedule:run'));
     }
 
     public function test_xendit() {

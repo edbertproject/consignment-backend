@@ -4,10 +4,12 @@ namespace Database\Seeders;
 
 use App\Entities\Invoice;
 use App\Entities\Order;
+use App\Entities\OrderStatus;
 use App\Entities\Product;
 use App\Entities\User;
 use App\Services\InvoiceService;
 use App\Services\NumberSettingService;
+use App\Services\OrderService;
 use App\Utils\Constants;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -31,23 +33,27 @@ class PurchaseSeeder extends Seeder
             $prices = [2500000,5500000,18500000];
             $multipliedPrice = [50000,250000,150000];
 
-            for ($u=1; $u <= 200; $u++) {
+            for ($u=201; $u <= 400; $u++) {
                 $partner = User::query()->whereHas('roles', function ($query) {
                     $query->whereIn('role_id', [
                         Constants::ROLE_PARTNER_ID
                     ]);
                 })->inRandomOrder()->first();
 
-                $type = Constants::PRODUCT_TYPES[array_rand(Constants::PRODUCT_TYPES)];
+                $types = [
+                    Constants::PRODUCT_TYPE_CONSIGN,
+                    Constants::PRODUCT_TYPE_AUCTION,
+                ];
+                $type = $types[array_rand($types)];
 
                 $product = [
                     'product_category_id' => 4,
                     'type' => $type,
-                    'participant' => $type === Constants::PRODUCT_TYPE_SPECIAL_AUCTION ? rand(3,5) : null,
+                    'participant' => null,
                     'partner_id' => $partner->partner->id,
                     'name' => 'Tes produk ' . $u,
-                    'slug' => Str::slug('Tes produk ' . $u),
-                    'start_date' => Carbon::today()->addDays(rand(0, 30)),
+                    'slug' => Str::slug('Tes produk ' . $u . Str::random('4')),
+                    'start_date' => Carbon::now()->startOfMonth()->addDays(rand(0, 30)),
                     'weight' => rand(0,5),
                     'quantity' => 1,
                     'available_quantity' => 1,
@@ -127,8 +133,39 @@ class PurchaseSeeder extends Seeder
                             'partner_id' => $product->partner_id,
                             'quantity' => $product->quantity,
                             'price' => $product->type === Constants::PRODUCT_TYPE_CONSIGN ? $product->price : $product->start_price,
-                            'status' => Constants::ORDER_STATUS_FINISH
                         ]);
+
+                    $primaryStatus = [
+                        Constants::ORDER_STATUS_WAITING_PAYMENT,
+                        Constants::ORDER_STATUS_PAID,
+                        Constants::ORDER_STATUS_PROCESS,
+                        Constants::ORDER_STATUS_FINISH,
+                    ];
+                    foreach ($primaryStatus as $status) {
+                        OrderService::updateStatus($ordered->id, $status);
+                    }
+
+                    $seller = [
+                        Constants::ORDER_SELLER_STATUS_WAITING_CONFIRM,
+                        Constants::ORDER_SELLER_STATUS_PROCESSING,
+                        Constants::ORDER_SELLER_STATUS_ON_DELIVERY,
+                        Constants::ORDER_SELLER_STATUS_ARRIVED,
+                        Constants::ORDER_SELLER_STATUS_COMPLETE,
+                    ];
+                    foreach ($seller as $status) {
+                        OrderService::updateStatus($ordered->id, $status, Constants::ORDER_STATUS_TYPE_SELLER);
+                    }
+
+                    $buyer = [
+                        Constants::ORDER_BUYER_STATUS_PENDING,
+                        Constants::ORDER_BUYER_STATUS_PROCESSED,
+                        Constants::ORDER_BUYER_STATUS_ON_DELIVERY,
+                        Constants::ORDER_BUYER_STATUS_ARRIVED,
+                        Constants::ORDER_BUYER_STATUS_COMPLETE,
+                    ];
+                    foreach ($buyer as $status) {
+                        OrderService::updateStatus($ordered->id, $status, Constants::ORDER_STATUS_TYPE_BUYER);
+                    }
 
                     $invoice->subtotal = $ordered->price * $ordered->quantity;
                     $invoice->admin_fee = 2500;

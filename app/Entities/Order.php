@@ -31,11 +31,6 @@ class Order extends BaseModelUUID
         'partner_id',
         'quantity',
         'price',
-        'status',
-        'status_seller',
-        'status_seller_updated_at',
-        'status_buyer',
-        'status_buyer_updated_at',
         'notes',
     ];
 
@@ -47,13 +42,41 @@ class Order extends BaseModelUUID
     public $appends = [
         'can_update',
         'can_delete',
+        'status',
         'next_status',
         'can_process_next_status',
+        'status_seller',
         'next_status_seller',
         'can_process_next_status_seller',
+        'status_buyer',
         'next_status_buyer',
         'can_process_next_status_buyer',
     ];
+
+    public function statuses() {
+        return $this->hasMany(OrderStatus::class);
+    }
+
+    public function primaryStatuses() {
+        return $this->statuses()
+            ->where('type', Constants::ORDER_STATUS_TYPE_PRIMARY)
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id');
+    }
+
+    public function sellerStatuses() {
+        return $this->statuses()
+            ->where('type', Constants::ORDER_STATUS_TYPE_SELLER)
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id');
+    }
+
+    public function buyerStatuses() {
+        return $this->statuses()
+            ->where('type', Constants::ORDER_STATUS_TYPE_BUYER)
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id');
+    }
 
     public function invoice()
     {
@@ -86,6 +109,18 @@ class Order extends BaseModelUUID
 
     public function getCanDeleteAttribute() {
         return false;
+    }
+
+    public function getStatusAttribute() {
+        return @$this->primaryStatuses()->first()->status;
+    }
+
+    public function getStatusSellerAttribute() {
+        return @$this->sellerStatuses()->first()->status;
+    }
+
+    public function getStatusBuyerAttribute() {
+        return @$this->buyerStatuses()->first()->status;
     }
 
     public function getNextStatusAttribute() {

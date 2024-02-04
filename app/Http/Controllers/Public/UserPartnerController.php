@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Public;
 
 use App\Criteria\Public\UserPartnerCriteria;
+use App\Entities\UserAddress;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\UserPartnerCreateRequest;
 use App\Http\Resources\UserPartnerShowResource;
+use App\Notifications\PartnerPendingNotification;
 use App\Repositories\UserRepository;
 use App\Services\ExceptionService;
 use App\Services\MediaService;
@@ -35,17 +37,29 @@ class UserPartnerController extends Controller
         try {
             DB::beginTransaction();
 
+            $userAddress = UserAddress::find($request->user_address_id);
+
+            $data = Auth::user();
+
             $request->merge([
-                'is_active' => false,
+                'user_address_id' => $userAddress->id,
+                'full_address' => $userAddress->full_address,
+                'postal_code' => $userAddress->postal_code,
+                'province_id' => $userAddress->province_id,
+                'city_id' => $userAddress->city_id,
+                'district_id' => $userAddress->district_id,
                 'status' => Constants::PARTNER_STATUS_WAITING_APPROVAL
             ]);
 
-            $data = Auth::user();
-            $data->partner()->updateOrCreate($request->all());
+            $data->partner()->updateOrCreate([
+                'id' => !empty($data->partner) ? $data->partner->id : null
+            ], $request->all());
+
+            $data->notify(new PartnerPendingNotification());
 
             DB::commit();
 
-            return ($this->show($request, $data->id))->additional([
+            return response()->json([
                 'success' => true,
                 'message' => 'Data created.'
             ]);

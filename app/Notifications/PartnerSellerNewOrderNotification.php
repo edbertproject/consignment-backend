@@ -2,26 +2,30 @@
 
 namespace App\Notifications;
 
-use App\Services\ProductService;
-use App\Utils\Constants;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
-class SpecialAuctionParticipantNotification extends Notification
+class PartnerSellerNewOrderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $order;
+    protected $expired;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(protected $product)
+    public function __construct($order, $expired)
     {
-        //
+        $this->order = $order;
+        $this->expired = $expired;
     }
 
     /**
@@ -43,14 +47,18 @@ class SpecialAuctionParticipantNotification extends Notification
      */
     public function toMail($notifiable)
     {
+        $header = NotificationService::getNewOrderHeader();
+        $table = NotificationService::getNewOrderTable($this->order);
+        $note = NotificationService::getNewOrderNote($this->expired);
+
         return (new MailMessage)
             ->from(env('MAIL_FROM_ADDRESS'), 'Consignx')
-            ->subject('You Are Selected in Special Auction')
-            ->greeting('Congratulations '.$notifiable->name)
-            ->line('You are selected for participate in special auction at '.Carbon::parse($this->product->start_date)->format("d-m-Y H:i"))
-            ->line('The product being auctioned is '. $this->product->name . ' with start price at '. $this->product->start_price)
-            ->action('Link', ProductService::generateFrontendUrl($this->product))
-            ->line('We will waiting you to participate in this auction');
+            ->subject('New Order #'.$this->order->number)
+            ->line(new HtmlString($header))
+            ->line(new HtmlString($table))
+            ->line('Things that you need to do:')
+            ->line(new HtmlString($note))
+            ->line('Thank you!');
     }
 
     /**
@@ -62,8 +70,8 @@ class SpecialAuctionParticipantNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'subject'=>'You Are Selected in Special Auction',
-            'message'=>'Please check your email for further detail and link to join special auction'
+            'subject' => 'New Order #'.$this->order->number,
+            'message' => 'You have a new order, please confirm order before ' . Carbon::parse($this->expired)->format('d F Y, H:i:s')
         ];
     }
 }

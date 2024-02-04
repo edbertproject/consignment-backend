@@ -88,6 +88,12 @@ class ProductsController extends Controller
                 'available_quantity' => $request->quantity
             ]);
 
+            if (Auth::user()->hasRole(Constants::ROLE_PARTNER_ID)) {
+                $request->merge([
+                    'status' => Constants::PRODUCT_STATUS_WAITING_APPROVAL,
+                ]);
+            }
+
             $data = $this->repository->update($request->all(),$id);
 
             $data->participants()->sync($request->get('eligible_participants'));
@@ -109,8 +115,12 @@ class ProductsController extends Controller
     public function getEligibleParticipants(Request $request) {
         $participants = ProductService::determineParticipantAuction($request->get('participant'));
 
+        $ids = array_column($participants,'id');
+
+        $placeholders = implode(',',array_fill(0, count($ids), '?'));
         return BaseResource::collection(
-            User::query()->findMany(array_column($participants,'id')),
+            User::query()->whereIn('id',$ids)
+                ->orderByRaw("field(id,{$placeholders})", $ids)->get(),
         );
     }
 

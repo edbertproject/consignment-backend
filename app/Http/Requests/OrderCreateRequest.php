@@ -48,9 +48,9 @@ class OrderCreateRequest extends FormRequest
             $rules['xendit_card_cvn'] = 'required|integer|digits:3';
         }
 
-        $orders = $this->get('orders', []);
+        $auction = $this->get('product_auction_id');
 
-        if (is_array($orders)) {
+        if (empty($auction)) {
             $rules['cart_ids'] = ['required'];
             $rules['cart_ids.*'] = ['distinct', 'exists:carts,id'];
         } else {

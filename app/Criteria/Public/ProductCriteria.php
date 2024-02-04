@@ -31,11 +31,11 @@ class ProductCriteria implements CriteriaInterface
      */
     public function apply($model, RepositoryInterface $repository)
     {
-        if (Auth::check()) {
-            $model = $model->where(function ($where) {
-                $where->where('partner_id','!=',@Auth::user()->partner->id)->orWhereNull('partner_id');
-            });
-        }
+//        if (Auth::check()) {
+//            $model = $model->where(function ($where) {
+//                $where->where('partner_id','!=',@Auth::user()->partner->id)->orWhereNull('partner_id');
+//            });
+//        }
 
         if ($variety = $this->request->get('variety') ?? null) {
             if ($variety === 'featuring') {
@@ -50,7 +50,8 @@ class ProductCriteria implements CriteriaInterface
                     ->orderBy('start_date');
             } else if ($variety === 'incoming') {
                 $model = $model->where('start_date','>',Carbon::now())
-                    ->orderBy('start_date');
+                    ->where('status', Constants::PRODUCT_STATUS_APPROVED)
+                    ->orderBy('end_date');
             }
         }
 
@@ -61,7 +62,7 @@ class ProductCriteria implements CriteriaInterface
                         ->where('price','>=',$minPrice);
                 })->orWhere(function ($q) use($minPrice) {
                     $q->where('type','!=',Constants::PRODUCT_TYPE_CONSIGN)
-                        ->where('price','>=',$minPrice);
+                        ->where('start_price','>=',$minPrice);
                 });
             });
         }
@@ -73,7 +74,7 @@ class ProductCriteria implements CriteriaInterface
                         ->where('price','<=',$maxPrice);
                 })->orWhere(function ($q) use($maxPrice) {
                     $q->where('type','!=',Constants::PRODUCT_TYPE_CONSIGN)
-                        ->where('price','<=',$maxPrice);
+                        ->where('start_price','<=',$maxPrice);
                 });
             });
         }
@@ -86,12 +87,18 @@ class ProductCriteria implements CriteriaInterface
             $model = $model->where('type', $type);
         }
 
-        return $model->where('type','!=',Constants::PRODUCT_TYPE_SPECIAL_AUCTION)
-            ->whereIn('status',[
-                Constants::PRODUCT_STATUS_APPROVED,
-                Constants::PRODUCT_STATUS_ACTIVE,
-                Constants::PRODUCT_STATUS_SOLD,
-                // Constants::PRODUCT_STATUS_CLOSED
-            ]);
+        return $model->where(function ($where) {
+            $where->where(function ($inner) {
+                $inner->where('type','=',Constants::PRODUCT_TYPE_SPECIAL_AUCTION)
+                    ->whereHas('participants', function ($p) {
+                        $p->where('user_id', Auth::id());
+                    });
+            })->orWhere('type','!=',Constants::PRODUCT_TYPE_SPECIAL_AUCTION);
+        })->whereIn('status',[
+            Constants::PRODUCT_STATUS_APPROVED,
+            Constants::PRODUCT_STATUS_ACTIVE,
+            Constants::PRODUCT_STATUS_SOLD,
+            // Constants::PRODUCT_STATUS_CLOSED
+        ]);
     }
 }

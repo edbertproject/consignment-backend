@@ -46,7 +46,7 @@ class PaymentExpiredNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->from(env('MAIL_FROM_ADDRESS'), 'Consigment')
+            ->from(env('MAIL_FROM_ADDRESS'), 'Consignx')
             ->subject('Payment Expired Notification #'.$this->invoice->number)
             ->greeting('Hello, '.$notifiable->name)
             ->line('Your order ('.implode(', ',$this->orderNumber).') has been automatically canceled because the payment deadline has passed.')

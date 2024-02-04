@@ -11,6 +11,7 @@ use App\Entities\PaymentMethod;
 use App\Entities\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BaseResource;
+use App\Notifications\PaymentPendingNotification;
 use App\Services\ExceptionService;
 use App\Services\InvoiceService;
 use App\Services\NumberSettingService;
@@ -56,7 +57,7 @@ class OrdersController extends Controller
     }
 
     public function check(Request $request) {
-        $cart = Cart::query()
+        $carts = Cart::query()
             ->select(
                 DB::raw('IFNULL(products.partner_id,"ADMIN") AS partner')
             )->join('products','products.id','carts.product_id')
@@ -64,16 +65,72 @@ class OrdersController extends Controller
             ->pluck('partner')
             ->all();
 
-        if (count(array_unique($cart)) > 1) {
+        if (count(array_unique($carts)) > 1) {
             return response()->json([
                 'success' => false,
                 'message' => 'Checkout unavailable because product has different seller.'
             ], 422);
         }
 
+        $currentCarts = Cart::query()
+            ->where('user_id', Auth::id())
+            ->get();
+
+        foreach ($currentCarts as $cart) {
+            if (Order::query()
+                ->whereHas('invoice', function ($invoice) {
+                    $invoice->where('status', Constants::INVOICE_STATUS_PENDING);
+                })->where('product_id', $cart->product_id)
+                ->where('user_id', Auth::id())
+                ->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Checkout unavailable because product already checkout, please complete your order payment.'
+                ], 422);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Checkout available.'
+        ]);
+    }
+
+    public function checkAuction(Request $request) {
+        $product = Product::query()
+            ->with('photo')
+            ->where('id',$request->product_id)
+            ->where('status', Constants::PRODUCT_STATUS_CLOSED)
+            ->whereRaw("DATE_ADD(products.end_date, INTERVAL ".Constants::PRODUCT_AUCTION_CHECKOUT_EXPIRES." HOUR) >= NOW()")
+            ->where(function ($where) {
+                $where->whereHas('bids', function ($bid) {
+                    $bid->where('user_id',Auth::id());
+                })->orWhere('winner_id',Auth::id());
+            })->first();
+
+        if (Order::query()
+            ->whereHas('invoice', function ($invoice) {
+                $invoice->where('status', Constants::INVOICE_STATUS_PENDING);
+            })->where('product_id', $product->id)
+            ->where('user_id', Auth::id())
+            ->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Checkout unavailable because product already checkout, please complete your order payment.'
+            ], 422);
+        }
+
+        if (empty($product)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Checkout for this product is unavailable.'
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Checkout available.',
+            'data' => $product
         ]);
     }
 
@@ -128,7 +185,11 @@ class OrdersController extends Controller
                     $cart->delete();
                 }
             } else {
-                $invoice->subtotal += $productAuctionId->price * $productAuctionId->available_quantity;
+                $price = @$productAuctionId->bids()
+                    ->where('user_id',Auth::id())
+                    ->orderByDesc('id')
+                    ->first()->amount;
+                $invoice->subtotal += $price * $productAuctionId->available_quantity;
 
                 $data = [
                     'date' => $date,
@@ -138,10 +199,7 @@ class OrdersController extends Controller
                     'product_id' => $productAuctionId->id,
                     'partner_id' => $productAuctionId->partner_id,
                     'quantity' => $productAuctionId->available_quantity,
-                    'price' => @$productAuctionId->bids()
-                        ->where('user_id',Auth::id())
-                        ->orderByDesc('id')
-                        ->first()->amount,
+                    'price' => $price,
                 ];
 
                 OrderService::storeOrder($data, NumberSettingService::generate(Order::class));
@@ -154,14 +212,14 @@ class OrdersController extends Controller
             $invoice->save();
 
             XenditService::createXendit($request, $invoice);
-//            $user->notify(new PaymentMethodNotification($invoice));
+            $user->notify(new PaymentPendingNotification($invoice));
 
             DB::commit();
 
-            if(config('app.env') != 'production') {
-                sleep(2);
-                XenditService::payXendit($invoice);
-            }
+//            if(config('app.env') != 'production') {
+//                sleep(2);
+//                XenditService::payXendit($invoice);
+//            }
 
             return ($this->showStore($request, $invoice->id))->additional([
                 'success' => true,
@@ -177,15 +235,13 @@ class OrdersController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $this->repository->update([
-                'status_buyer' => $request->get('status')
-            ],$id);
+            $orderStatus = OrderService::updateStatus($id,$request->get('status'),Constants::ORDER_STATUS_TYPE_BUYER);
 
-            OrderService::handleUpdateStatusBuyer($data);
+            OrderService::handleUpdateStatusBuyer($orderStatus->status, $id);
 
             DB::commit();
 
-            return ($this->show($request, $data->id))->additional([
+            return ($this->show($request, $id))->additional([
                 'success' => true,
                 'message' => 'Data status updated.'
             ]);

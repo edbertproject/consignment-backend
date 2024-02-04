@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Public;
 
 use App\Rules\UsernameRule;
+use App\Rules\UserPartnerRegisterAddressRule;
 use App\Services\MediaService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -28,11 +29,7 @@ class UserPartnerCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'full_address' => 'required',
-            'postal_code' => 'required|integer',
-            'province_id' => ['required', 'exists:provinces,id,deleted_at,NULL'],
-            'city_id' => ['required', 'exists:cities,id,deleted_at,NULL,province_id,'.$this->request->get('province_id')],
-            'district_id' => ['required', 'exists:districts,id,deleted_at,NULL,city_id,'.$this->request->get('city_id')]
+            'user_address_id' => ['required', 'exists:user_addresses,id,deleted_at,NULL,user_id,' . Auth::id(), new UserPartnerRegisterAddressRule],
         ];
     }
 }
